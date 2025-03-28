@@ -98,6 +98,21 @@ Temporary Items
 !.vscode/extensions.json
 !.vscode/*.code-snippets
 
+ControllerFirmware/.vscode/*
+!ControllerFirmware/.vscode/settings.json
+!ControllerFirmware/.vscode/tasks.json
+!ControllerFirmware/.vscode/launch.json
+!ControllerFirmware/.vscode/extensions.json
+!ControllerFirmware/.vscode/*.code-snippets
+
+InterfaceFirmware/.vscode/*
+!InterfaceFirmware/.vscode/settings.json
+!InterfaceFirmware/.vscode/tasks.json
+!InterfaceFirmware/.vscode/launch.json
+!InterfaceFirmware/.vscode/extensions.json
+!InterfaceFirmware/.vscode/*.code-snippets
+
+
 # Local History for Visual Studio Code
 .history/
 
