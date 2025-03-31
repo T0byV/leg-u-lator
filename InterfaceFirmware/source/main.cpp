@@ -2,12 +2,19 @@
 #include "pico/stdlib.h"
 #include "pico/cyw43_arch.h"
 
+#include "pico/multicore.h"
 
-
+// See https://www.raspberrypi.com/documentation/pico-sdk/high_level.html#detailed-description-8 for intercore interaction
+void core1_entry() {
+    while(1)
+        ;
+}
 
 int main()
 {
     stdio_init_all();
+
+    multicore_launch_core1(core1_entry);
 
     // Initialise the Wi-Fi chip
     if (cyw43_arch_init()) {
