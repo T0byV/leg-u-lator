@@ -23,19 +23,19 @@ class SyncI2CMaster {
     }
 
     template<int N>
-    std::array<uint8_t, N> read(uint8_t address) const noexcept {
+    std::array<uint8_t, N> read(uint8_t address, bool stop) const noexcept {
         std::array<uint8_t, N> data{};
 
         auto n = data.size() * sizeof(uint8_t); // Useless mult, but prevents possible copy-paste errors
 
-        ASSERT(i2c_read_blocking(instance, address, data.data(), n, false) == n);
+        ASSERT(i2c_read_blocking(instance, address, data.data(), n, !stop) == n);
 
         return data;
     }
 
     template<int N>
-    void write(uint8_t address, const std::span<uint8_t, N>& data) noexcept {
-        ASSERT(i2c_write_blocking(instance, address, data.data(), data.size_bytes(), false) == data.size_bytes());
+    void write(uint8_t address, const std::array<uint8_t, N>& data, bool stop) noexcept {
+        ASSERT(i2c_write_blocking(instance, address, data.data(), data.size() * sizeof(uint8_t), !stop) == data.size_bytes());
     }
 
     private:
