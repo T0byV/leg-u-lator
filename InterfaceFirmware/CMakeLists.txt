@@ -34,8 +34,8 @@ project(InterfaceFirmware C CXX ASM)
 pico_sdk_init()
 
 # Add executable. Default name is the project name, version 0.1
-
-add_executable(InterfaceFirmware main.c )
+include_directories(include/)
+add_executable(InterfaceFirmware source/main.cpp )
 
 pico_set_program_name(InterfaceFirmware "InterfaceFirmware")
 pico_set_program_version(InterfaceFirmware "0.1")
@@ -55,8 +55,7 @@ target_include_directories(InterfaceFirmware PRIVATE
 
 # Add any user requested libraries
 target_link_libraries(InterfaceFirmware 
-        pico_cyw43_arch_lwip_threadsafe_background
-        )
+        pico_cyw43_arch_lwip_threadsafe_background pico_multicore)
 
 pico_add_extra_outputs(InterfaceFirmware)
 
