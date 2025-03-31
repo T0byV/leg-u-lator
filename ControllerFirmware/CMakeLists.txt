@@ -3,7 +3,7 @@
 cmake_minimum_required(VERSION 3.13)
 
 set(CMAKE_C_STANDARD 11)
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Initialise pico_sdk from installed location
@@ -34,8 +34,8 @@ project(ControllerFirmware C CXX ASM)
 pico_sdk_init()
 
 # Add executable. Default name is the project name, version 0.1
-
-add_executable(ControllerFirmware main.c )
+include_directories(include/)
+add_executable(ControllerFirmware source/main.cpp )
 
 pico_set_program_name(ControllerFirmware "ControllerFirmware")
 pico_set_program_version(ControllerFirmware "0.1")
@@ -46,7 +46,7 @@ pico_enable_stdio_usb(ControllerFirmware 0)
 
 # Add the standard library to the build
 target_link_libraries(ControllerFirmware
-        pico_stdlib)
+        pico_stdlib hardware_i2c)
 
 # Add the standard include files to the build
 target_include_directories(ControllerFirmware PRIVATE
