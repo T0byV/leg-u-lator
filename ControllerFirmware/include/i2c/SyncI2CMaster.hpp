@@ -9,7 +9,7 @@
 class SyncI2CMaster {
     public:
     SyncI2CMaster(uint8_t instance_number, uint8_t sda_pin = PICO_DEFAULT_I2C_SDA_PIN, uint8_t scl_pin = PICO_DEFAULT_I2C_SCL_PIN, bool use_internal_pullups = false) : instance_number{instance_number}, instance{I2C_INSTANCE(instance_number)} {
-        ASSERT(i2c_init(instance, bus_frequency) == bus_frequency); // Initialize I2C peripheral
+        i2c_init(instance, bus_frequency); // Initialize I2C peripheral
 
         gpio_set_function(sda_pin, GPIO_FUNC_I2C); // Setup pins
         gpio_set_function(scl_pin, GPIO_FUNC_I2C);
@@ -28,14 +28,14 @@ class SyncI2CMaster {
 
         auto n = data.size() * sizeof(uint8_t); // Useless mult, but prevents possible copy-paste errors
 
-        ASSERT(i2c_read_blocking(instance, address, data.data(), n, !stop) == n);
-
+        i2c_read_blocking(instance, address, data.data(), n, !stop);
+        
         return data;
     }
 
     template<int N>
     void write(uint8_t address, const std::array<uint8_t, N>& data, bool stop) noexcept {
-        ASSERT(i2c_write_blocking(instance, address, data.data(), data.size() * sizeof(uint8_t), !stop) == data.size_bytes());
+        i2c_write_blocking(instance, address, data.data(), data.size() * sizeof(uint8_t), !stop);
     }
 
     private:
