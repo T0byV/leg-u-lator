@@ -151,3 +151,7 @@ $RECYCLE.BIN/
 *.lnk
 
 # End of https://www.toptal.com/developers/gitignore/api/visualstudiocode,platformio,c++,windows,linux,macos
+
+# Generated/downloaded Interface files
+InterfaceFirmware/src/my_fsdata.c
+InterfaceFirmware/src/external/makefsdata
