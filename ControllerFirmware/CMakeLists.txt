@@ -42,7 +42,7 @@ pico_set_program_version(ControllerFirmware "0.1")
 
 # Modify the below lines to enable/disable output over UART/USB
 pico_enable_stdio_uart(ControllerFirmware 0)
-pico_enable_stdio_usb(ControllerFirmware 0)
+pico_enable_stdio_usb(ControllerFirmware 1)
 
 # Add the standard library to the build
 target_link_libraries(ControllerFirmware
