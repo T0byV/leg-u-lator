@@ -1,5 +1,8 @@
 #include <common.hpp>
 
+#include "lwip/tcp.h"
+#include "lwip/apps/httpd.h"
+
 #include "hw/UART.hpp"
 
 // See https://www.raspberrypi.com/documentation/pico-sdk/high_level.html#detailed-description-8 for intercore interaction
@@ -37,6 +40,9 @@ int main()
         uint8_t *ip_address = (uint8_t*)&(cyw43_state.netif[0].ip_addr.addr);
         printf("IP address %d.%d.%d.%d\n", ip_address[0], ip_address[1], ip_address[2], ip_address[3]);
     }
+
+    // Start lwip http server
+    httpd_init();
 
     while (true) {
         printf("Hello, world!\n");

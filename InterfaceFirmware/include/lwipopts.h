@@ -86,4 +86,10 @@
 #define SLIP_DEBUG                  LWIP_DBG_OFF
 #define DHCP_DEBUG                  LWIP_DBG_OFF
 
+#define LWIP_HTTPD                  1
+#define LWIP_HTTPD_SSI              1
+#define LWIP_HTTPD_CGI              1
+
+#define HTTPD_FSDATA_FILE "../src/my_fsdata.c"
+
 #endif /* __LWIPOPTS_H__ */

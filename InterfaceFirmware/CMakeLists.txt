@@ -55,7 +55,9 @@ target_include_directories(InterfaceFirmware PRIVATE
 
 # Add any user requested libraries
 target_link_libraries(InterfaceFirmware 
-        pico_cyw43_arch_lwip_threadsafe_background pico_multicore)
+        pico_cyw43_arch_lwip_threadsafe_background
+        pico_multicore
+        pico_lwip_http)
 
 pico_add_extra_outputs(InterfaceFirmware)
-
+add_subdirectory(src)
