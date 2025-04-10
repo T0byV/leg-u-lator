@@ -32,9 +32,9 @@ class PWM {
         }
 
         void set_duty_cycle(uint pin, uint16_t duty_percentage) noexcept {
-            if (duty_percentage < 0)
+            if (duty_percentage <= 0)
                 duty_percentage = 0;
-            if (duty_percentage > 100)
+            if (duty_percentage >= 100)
                 duty_percentage = 100;
     
             uint level = wrap_resolution * duty_percentage * 0.01;
