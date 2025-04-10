@@ -2,7 +2,7 @@
 
 
 #include <common.hpp>
-#include <i2c/SyncI2CMaster.hpp>
+#include <hw/SyncI2CMaster.hpp>
 
 class INA219 {
     public:
