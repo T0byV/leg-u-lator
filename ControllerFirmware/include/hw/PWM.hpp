@@ -4,11 +4,13 @@
 #include "hardware/pwm.h"
 #include "hardware/clocks.h"
 
+#include <array>
+
 template<int N>
 class PWM {
     public:
         // Minimum frequency seems to be 5kHz
-        PWM(const std::array<uint, N>& pwm_pins, uint16_t wrap_resolution = 100, uint32_t pwm_frequency_hz = 5000) : pwm_pins{pwm_pins}, wrap_resolution{wrap_resolution}
+        PWM(const std::array<uint,N>& pwm_pins, uint16_t wrap_resolution = 100, uint32_t pwm_frequency_hz = 5000) : pwm_pins{pwm_pins}, wrap_resolution{wrap_resolution}
         {
             uint32_t clk_hz = clock_get_hz(clk_sys);
             float divider = static_cast<float>(clk_hz) / (wrap_resolution * pwm_frequency_hz);
