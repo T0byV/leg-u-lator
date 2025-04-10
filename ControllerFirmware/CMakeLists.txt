@@ -46,7 +46,7 @@ pico_enable_stdio_usb(ControllerFirmware 1)
 
 # Add the standard library to the build
 target_link_libraries(ControllerFirmware
-        pico_stdlib hardware_i2c pico_multicore)
+        pico_stdlib hardware_i2c pico_multicore hardware_pwm)
 
 # Add the standard include files to the build
 target_include_directories(ControllerFirmware PRIVATE
