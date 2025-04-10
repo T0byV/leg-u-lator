@@ -1,5 +1,6 @@
 #include <common.hpp>
 
+#include <hw/PWM.hpp>
 #include <hw/SyncI2CMaster.hpp>
 #include <drivers/fram.hpp>
 #include <drivers/current_sensor.hpp>
@@ -20,6 +21,11 @@ int main() {
     gpio_set_dir(PICO_DEFAULT_LED_PIN, GPIO_OUT);
 
     multicore_launch_core1(core1_entry);
+
+    PWM heating_pwm{
+        {6, 7, 8, 9} // GPIO pins used
+    };
+    // EXAMPLE: heating_pwm.set_duty_cycle(6, 40); sets pin 6 to 40% duty cycle
 
     SyncI2CMaster bus0{0, 4, 5, true};
     /*Sensor<6, 2> sensing{&bus0, {{
