@@ -4,6 +4,7 @@
 #include <drivers/fram.hpp>
 #include <drivers/current_sensor.hpp>
 #include <drivers/temp_sensor.hpp>
+#include <functions/powerdata.hpp>
 
 // See: https://www.raspberrypi.com/documentation/pico-sdk/high_level.html#detailed-description-8 for core interaction
 void core1_entry() {
@@ -36,6 +37,13 @@ int main() {
         {&bus0, 0x41, 1, 0.1005}, // Channel 3
         {&bus0, 0x40, 1, 0.1006}  // Channel 4
     }};
+
+    // Battery processing, to be moved somewhere
+    Battery bat;    // Initialize battery data processing
+    // bat.startup(mV);  // Initialize battery data, needs some I2C magic measured voltage in mV
+    // Probably every couple of seconds?
+    //bat.update_soc(mV,mA); // Update battery SoC estimate, needs some I2C magic measured voltage [mV] and current [mA]
+    //bat.estimate_life();   // Update estimated battery hours left
   
     bool s = false;
     while (true) {
