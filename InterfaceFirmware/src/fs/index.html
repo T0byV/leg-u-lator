@@ -3,18 +3,71 @@
 
 <head>
     <title>Leg-u-lator</title>
+    <link rel="stylesheet" href="style.css">
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
 </head>
 
 <body>
-    <h1>Leg-u-lator</h1>
-    <div class="info">
-        <p>Battery is at <span class="bat_perc">80%</span></p>
-        <p>Current leg temperature is <span class="leg_temp">35.2</span> &deg;C</p>
-        <p>Leg-u-lator is set to <span class="aim_temp">38.0</span> &deg;C</p>
-        <p>Timer is not running</p>
+    <div class="banners">
+        <div class="banner notice">
+            <p>Timer set for 30 minutes</p>
+        </div>
+        <div class="banner warning">
+            <p>Battery low - 15 minutes remaining</p>
+        </div>
+        <div class="banner error">
+            <p>Overcurrent detected, shut off immediately</p>
+        </div>
     </div>
-    <div class="settings">
-        <a href="plop">aaa</a>
+    <div id="main">
+        <h1>Leg-u-lator</h1>
+        <div id="battery">
+            <p>Battery is at <span id="battery_percentage"></span>%</p>
+            <p>About <span id="remaining_time">1h12m</span> remaining.</p>
+        </div>
+        <br>
+        <div id="temperatures">
+            <div id="current_temperature">
+                <label>Measured temperature:</label>
+                <p class="temp" id="current_temperature">29.6</p>
+            </div>
+            <div id="set_temperature">
+                <label>Set temperature:</label>
+                <div id="temp_setter">
+                    <p class="temp" id="set_temperature">30.0</p>
+                    <div class="btns">
+                        <button id="increase_temp">+0.5&nbsp;&deg;C</button>
+                        <button id="decrease_temp">-0.5&nbsp;&deg;C</button>
+                    </div>
+                </div>
+                <div id="limits">
+                    <label class="temp_limit">Min:</label><span class="temp"> 29.5</span>
+                    <label class="temp_limit">Max:</label><span class="temp"> 30.5</span>
+                </div>
+            </div>
+        </div>
+        <br>
+        <div id="timer">
+            <label>Timer:</label>
+            <span id="timer_status">
+                active
+            </span>
+            <button id="timer_pause">
+                II
+            </button>
+            <label>Remaining:</label>
+            <span id="timer_remaining">00:20</span>
+            <div id="timer_settings">
+                <button>+</button>
+                <button>-</button>
+            </div>
+        </div>
+        <br>
+        <div id="power_button">
+            On 👍✅
+            ❌
+        </div>
+        <br>
     </div>
 </body>
 
