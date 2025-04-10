@@ -1,9 +1,9 @@
 #include <common.hpp>
 
 #include <i2c/SyncI2CMaster.hpp>
-//#include <drivers/fram.hpp>
-//#include <drivers/temp_sensor.hpp>
+#include <drivers/fram.hpp>
 #include <drivers/current_sensor.hpp>
+#include <drivers/temp_sensor.hpp>
 
 // See: https://www.raspberrypi.com/documentation/pico-sdk/high_level.html#detailed-description-8 for core interaction
 void core1_entry() {
@@ -13,6 +13,10 @@ void core1_entry() {
 
 int main() {
     stdio_init_all();
+    printf("Hello world!\n");
+
+    gpio_init(PICO_DEFAULT_LED_PIN);
+    gpio_set_dir(PICO_DEFAULT_LED_PIN, GPIO_OUT);
 
     multicore_launch_core1(core1_entry);
 
@@ -32,7 +36,7 @@ int main() {
         {&bus0, 0x41, 1, 0.1005}, // Channel 3
         {&bus0, 0x40, 1, 0.1006}  // Channel 4
     }};
-
+  
     bool s = false;
     while (true) {
         gpio_put(PICO_DEFAULT_LED_PIN, s);
