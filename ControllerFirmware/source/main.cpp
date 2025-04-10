@@ -1,8 +1,9 @@
 #include <common.hpp>
 
-#include <i2c/SyncI2CMaster.hpp>
+#include <hw/SyncI2CMaster.hpp>
 #include <drivers/fram.hpp>
 #include <drivers/current_sensor.hpp>
+//#include <drivers/fram.hpp>
 #include <drivers/temp_sensor.hpp>
 
 // See: https://www.raspberrypi.com/documentation/pico-sdk/high_level.html#detailed-description-8 for core interaction
