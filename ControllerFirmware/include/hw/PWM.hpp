@@ -3,7 +3,6 @@
 #include <common.hpp>
 #include "hardware/pwm.h"
 #include "hardware/clocks.h"
-#include "vector"
 
 template<int N>
 class PWM {
