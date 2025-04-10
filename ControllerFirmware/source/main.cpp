@@ -22,8 +22,8 @@ int main() {
 
     multicore_launch_core1(core1_entry);
 
-    PWM heating_pwm{
-        {6, 7, 8, 9} // GPIO pins used
+    PWM<4> heating_pwm{
+        {{6, 7, 8, 9}} // GPIO pins used
     };
     // EXAMPLE: heating_pwm.set_duty_cycle(6, 40); sets pin 6 to 40% duty cycle
 
