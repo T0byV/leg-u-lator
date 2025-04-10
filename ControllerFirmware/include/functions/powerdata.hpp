@@ -8,7 +8,6 @@
 #pragma once
 
 #include <common.hpp>
-#include <i2c/SyncI2CMaster.hpp>
 
 #include <map>    // for mapping battery voltage to SOC
 #include <cmath>    // for using floor and stuff
@@ -20,7 +19,6 @@ class Battery {
         int voltage;            // mV, voltage of battery
         int life;               // h, remaining battery life
         uint64_t last_update;   // us, time since last soc update
-        int capacity;           // mAh, capacity of battery
         int cnt;                // #, counter for tracking history
 
         // Initializes all attributes, estimates SoC [%] using Voltage [mV] from battery
@@ -29,7 +27,6 @@ class Battery {
             voltage = powerdata_voltage;    // save measured voltage to battery attribute
             life = 0;                       // initialize battery life to 0h
             last_update = time_us_64();     // sets battery startup time
-            capacity = 5000;                // Capacity of used LiPo 4S battery
             cnt = 0;                        // Initialize tracking counter
 
             // Lookup table voltage[mV]-soc[%] of LiPo 4S battery
@@ -83,6 +80,7 @@ class Battery {
         // Updates estimated SoC [%] using coulomb counting, needs measured voltage [mV] and current [mA] from battery
         void update_soc(int powerdata_voltage, int powerdata_current){
             voltage = powerdata_voltage;    // save measured voltage to battery attribute
+            const int capacity = 5000;      // mAh, capacity of the used 4S LiPo battery
 
             // calculate time delta between SoC updates
             uint64_t current_time = time_us_64();   // us, current time
