@@ -16,7 +16,7 @@ void core1_entry() {
 
 int main() {
     stdio_init_all();
-    sleep_ms(1000);
+    // sleep_ms(1000);
     printf("Hello world!\n");
 
     gpio_init(PICO_DEFAULT_LED_PIN);
@@ -46,7 +46,7 @@ int main() {
         {&bus0, 0x40, 1, 0.1006}  // Channel 4
     }};
 
-    UART uart_bus{};
+    UART uart_bus{uart1, 4, 5};
 
     // bool s = false;
     while (true) {

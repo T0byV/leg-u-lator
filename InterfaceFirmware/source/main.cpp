@@ -2,7 +2,6 @@
 
 #include "hw/UART.hpp"
 
-
 // See https://www.raspberrypi.com/documentation/pico-sdk/high_level.html#detailed-description-8 for intercore interaction
 void core1_entry() {
     while(1)
@@ -12,7 +11,7 @@ void core1_entry() {
 int main()
 {
     stdio_init_all();
-    sleep_ms(3000);
+    // sleep_ms(1000);
     printf("Hello world!\n");
 
     multicore_launch_core1(core1_entry);
@@ -26,7 +25,7 @@ int main()
     // Enable wifi station
     cyw43_arch_enable_sta_mode();
 
-    UART uart_bus{};
+    UART uart_bus{uart0, 16, 17};
     
     // printf("Connecting to Wi-Fi...\n");
     // if (cyw43_arch_wifi_connect_timeout_ms("Your Wi-Fi SSID", "Your Wi-Fi Password", CYW43_AUTH_WPA2_AES_PSK, 30000)) {

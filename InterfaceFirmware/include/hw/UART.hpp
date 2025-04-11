@@ -21,10 +21,10 @@ public:
     static inline UART* irq_userptrs[2] = { nullptr, nullptr };
 
 
-    UART(uint baudrate = 115200, uart_inst_t *instance = uart0, uint8_t tx_pin = 0, uint8_t rx_pin = 1) : instance{instance}
+    UART(uart_inst_t *instance = uart0, uint8_t tx_pin = 0, uint8_t rx_pin = 1, uint baudrate = 115200) : instance{instance}
     {
-        gpio_set_function(0, UART_FUNCSEL_NUM(instance, tx_pin));
-        gpio_set_function(1, UART_FUNCSEL_NUM(instance, rx_pin));
+        gpio_set_function(tx_pin, UART_FUNCSEL_NUM(instance, tx_pin));
+        gpio_set_function(rx_pin, UART_FUNCSEL_NUM(instance, rx_pin));
 
         uart_init(instance, baudrate);
 
