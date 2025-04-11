@@ -2,16 +2,6 @@
 
 #include "hw/UART.hpp"
 
-UART* irq_userptrs[2] = { nullptr, nullptr };
-
-extern void on_uart0_irq() {
-    if (irq_userptrs[0])
-        irq_userptrs[0]->on_uart_rx();
-}
-
-extern void on_uart1_irq() {
-    if (irq_userptrs[1]) irq_userptrs[0]->on_uart_rx();
-}
 
 // See https://www.raspberrypi.com/documentation/pico-sdk/high_level.html#detailed-description-8 for intercore interaction
 void core1_entry() {
