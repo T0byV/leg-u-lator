@@ -3,13 +3,14 @@
 #include <common.hpp>
 #include "hardware/pwm.h"
 #include "hardware/clocks.h"
-#include "vector"
+
+#include <array>
 
 template<int N>
 class PWM {
     public:
         // Minimum frequency seems to be 5kHz
-        PWM(const std::array<uint, N>& pwm_pins, uint16_t wrap_resolution = 100, uint32_t pwm_frequency_hz = 5000) : pwm_pins{pwm_pins}, wrap_resolution{wrap_resolution}
+        PWM(const std::array<uint,N>& pwm_pins, uint16_t wrap_resolution = 100, uint32_t pwm_frequency_hz = 5000) : pwm_pins{pwm_pins}, wrap_resolution{wrap_resolution}
         {
             uint32_t clk_hz = clock_get_hz(clk_sys);
             float divider = static_cast<float>(clk_hz) / (wrap_resolution * pwm_frequency_hz);
@@ -32,9 +33,9 @@ class PWM {
         }
 
         void set_duty_cycle(uint pin, uint16_t duty_percentage) noexcept {
-            if (duty_percentage < 0)
+            if (duty_percentage <= 0)
                 duty_percentage = 0;
-            if (duty_percentage > 100)
+            if (duty_percentage >= 100)
                 duty_percentage = 100;
     
             uint level = wrap_resolution * duty_percentage * 0.01;
