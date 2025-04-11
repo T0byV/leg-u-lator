@@ -11,7 +11,7 @@ void core1_entry() {
         ;
 }
 
-bool connect_to_wifi(){
+bool connect_to_wifi() {
     if (cyw43_arch_wifi_connect_timeout_ms("Your Wi-Fi SSID", "Your Wi-Fi Password", CYW43_AUTH_WPA2_AES_PSK, 30000)) {
             printf("failed to connect.\n");
             return false;
@@ -24,8 +24,7 @@ bool connect_to_wifi(){
         }
 }
 
-int main()
-{
+int main() {
     stdio_init_all();
     // sleep_ms(1000);
     printf("Hello world!\n");
@@ -59,8 +58,6 @@ int main()
     httpd_init();
 
     while (true) {
-        printf("Hello, world!\n");
-        sleep_ms(1000);
         // gpio_put(PICO_DEFAULT_LED_PIN, s);
         // s = !s;
         printf("Cycle start\n");
