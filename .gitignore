@@ -154,4 +154,3 @@ $RECYCLE.BIN/
 
 # Generated/downloaded Interface files
 InterfaceFirmware/src/my_fsdata.c
-InterfaceFirmware/src/external/makefsdata
