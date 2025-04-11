@@ -41,15 +41,15 @@ int main() {
 
     // Battery processing, to be moved somewhere
     Battery bat;                                                    // Initialize battery data processing
-    //bat.startup(int powerdata_voltage);                           // Initialize battery data, needs some I2C magic measured voltage in mV
+    //bat.startup(float powerdata_voltage);                           // Initialize battery data, needs some I2C magic measured voltage in mV
 
-    //bat.update_soc(int powerdata_voltage, int powerdata_current); // Every few seconds: Update battery SoC estimate, needs some I2C magic measured voltage [mV] and current [mA]
-    //bat.estimate_life(int pwr_usage_now);                         // Every few seconds: Update estimated battery hours left, needs estimated power usage from feedback model
+    //bat.update_soc(float powerdata_voltage, float powerdata_current); // Every few seconds: Update battery SoC estimate, needs some I2C magic measured voltage [mV] and current [mA]
+    //bat.estimate_life(float pwr_usage_now);                         // Every few seconds: Update estimated battery hours left, needs estimated power usage from feedback model
 
     // Safety controller, to be moved somewhere
     SafetyControl safety;
     //safety.check_startup(bool i2c_status_power, bool i2c_status_sensorsheating, bool uart_status_ui);         // Check startup connection errors, needs a status boolean of the two I2C lines and UART line
-    //safety.check_safety(bool i2c_power, int powerdata_current, int powerdata_voltage, bool i2c_sensorsheating, auto temps, auto currents, int pwr_usage_now, auto pwm_heating, int bat_soc, bool uart_ui);   // Every few seconds: Checks for safety concerns, uses basically all data available                                                                                 // Every few seconds: Check for safety concerns
+    //safety.check_safety(bool i2c_power, float powerdata_current, float powerdata_voltage, bool i2c_sensorsheating, const std::array<std::array<int32_t, 2>, 6>& temps, const std::array<float, 4>& currents, float pwr_usage_now, const std::array<float, 4>& pwm_heating, int bat_soc, bool uart_ui);   // Every few seconds: Checks for safety concerns, uses basically all data available                                                                                 // Every few seconds: Check for safety concerns
     //safety.alarm(bool severe_error);                                                                          // WIP: behaviour when the safety controller has raised the severe error flag
     //cout << "UI message after safety check + severe flag: " << safety.ui_msg << " - " << safety.severe_error << "\n";         // debugging line
   

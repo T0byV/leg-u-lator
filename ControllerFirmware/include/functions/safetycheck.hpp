@@ -38,12 +38,11 @@ WIP!
 #include <common.hpp>
 
 #include <cmath>        // for using floor and stuff
-#include <string>       // for using strings
-using namespace std;    // get rid of the std:: shit
+#include <array>        // for using arrays
 
 class SafetyControl {
     public:
-        string ui_msg;              // String message sent to UI
+        const char* ui_msg;         // String message sent to UI
         bool severe_error;          // Flag for severe error, which should disable PWM + Cut heating activation line + Ring buzzer
         int cnt;                    // #, counter for tracking history
 
@@ -67,25 +66,25 @@ class SafetyControl {
         }
 
         // Continously monitors device for safety issues
-        void check_safety(bool i2c_power, int powerdata_current, int powerdata_voltage, bool i2c_sensorsheating, auto temps, auto currents, int pwr_usage_now, auto pwm_heating, int bat_soc, bool uart_ui) {
+        void check_safety(bool i2c_power, float powerdata_current, float powerdata_voltage, bool i2c_sensorsheating, const std::array<std::array<int32_t, 2>, 6>& temps, const std::array<float, 4>& currents, float pwr_usage_now, const std::array<float, 4>& pwm_heating, int bat_soc, bool uart_ui) {
             /* Variables coming in:
-                    bool i2c_power;                 // status of power I2C line
-                    int powerdata_current;          // mA, battery current measured over I2C line
-                    int powerdata_voltage;          // mV, battery voltage measured over I2C line
+                    bool i2c_power;                   // status of power I2C line
+                    float powerdata_current;          // mA, battery current measured over I2C line
+                    float powerdata_voltage;          // mV, battery voltage measured over I2C line
 
-                    bool i2c_sensorsheating;        // status of sensors and heating I2C line
-                    float temps[6];                 // arrary [degrees C?], data of the 6 sensing clusters of sensing
-                    int currents[4];                // array [mA], data of the 4 current sensors of heating  
+                    bool i2c_sensorsheating;                                // status of sensors and heating I2C line
+                    const std::array<std::array<int32_t, 2>, 6>& temps;     // pointer array [degrees C?], data of the 6 sensing clusters of sensing, each cluster having 2 sensor values
+                    const std::array<float, 4>& currents[4];                // pointer array [mA], data of the 4 current sensors of heating  
                     
-                    int pwr_usage_now;              // mW, total power usage for heating from model
-                    float pwm_heating[4];           // array with [ratio], PWM signals to heating from model
-                    int bat_soc;                    // %, battery SOC as determined from power data 
+                    float pwr_usage_now;                        // mW, total power usage for heating from model
+                    const std::array<float, 4>& pwm_heating;    // array with [ratio], PWM signals to heating from model
+                    int bat_soc;                                // %, battery SOC as determined from power data 
 
                     bool uart_ui;                   // status of UART connection to UI
             */
 
             // constants
-            const int tracking_size = 2;      // number of data values to be tracked
+            constexpr int tracking_size = 2;      // number of data values to be tracked
 
             // CONNECTION ERRORS
             if (i2c_power == false) {
@@ -103,12 +102,12 @@ class SafetyControl {
 
             // CHECKING BATTERY
             // Tracking battery data
-            int track_power_voltage[tracking_size] = { 0 }; //mV, tracking history of battery voltage
-            int track_power_current[tracking_size] = { 0 }; //mA, tracking history of battery current
+            std::array<float, tracking_size> track_power_voltage{}; //mV, tracking history of battery voltage
+            std::array<float, tracking_size> track_power_current{}; //mA, tracking history of battery current
             track_power_voltage[cnt] = powerdata_voltage; // put current data in history array
             track_power_current[cnt] = powerdata_current; // put current data in history array
             for (int i = 0; i<tracking_size; i++) {     // go through every history array element of voltage
-                int value = track_power_voltage[i];
+                float value = track_power_voltage[i];
                 // Check absence of reading / connection / response time (NaN/inf)
                 if (isnan(value) || isinf(value)) {
                     ui_msg = "No battery voltage data";
@@ -128,7 +127,7 @@ class SafetyControl {
                 }  
             }
             for (int i = 0; i<tracking_size; i++) {     // go through every history array element of current
-                int value = track_power_current[i];
+                float value = track_power_current[i];
                 // Check absence of reading / connection / response time (NaN/inf)
                 if (isnan(value) || isinf(value)) {
                     ui_msg = "No battery current data";
@@ -152,7 +151,7 @@ class SafetyControl {
                 ui_msg = "Different power consumption than expected";
             }
             // Compare battery current with current sensors of heating
-            int heating_current = currents[0]+currents[1]+currents[2]+currents[3];    // mA, total current measured by heating
+            float heating_current = currents[0]+currents[1]+currents[2]+currents[3];    // mA, total current measured by heating
             if (abs(powerdata_current - heating_current) >= 500) {      // difference in mA
                 ui_msg = "Power leakage";
                 severe_error = true;
@@ -168,45 +167,48 @@ class SafetyControl {
 
             // CHECKING SENSORS
             // Tracking sensor data
-            float track_temps[6][tracking_size] = { 0.0 }; //degrees C, tracking history of temperature sensors (row for each sensor)
-            for (int s = 0; s < 6; s++) {       // do for every single sensor
-                track_temps[s][cnt] = temps[s]; // put every sensor data in history array
-                for (int i = 0; i<tracking_size; i++) {     // go through every history array element of sensors
-                    float value = track_temps[s][i];
-                    // Check absence of reading / connection / response time (NaN/inf)
-                    if (isnan(value) || isinf(value)) {
-                        ui_msg = "No temperature sensor data";
-                    }
-                    else {
-                        // Sanity check values
-                        if (value < 0 || value > 50) {
-                            ui_msg = "Invalid temperature sensor data"; 
+            std::array<std::array<std::array<int32_t, 2>, 6>, tracking_size> track_temps{};     //degrees C, tracking history of temperature sensors (3D: tracking 6 clusters, each containing 2 sensors)
+            for (int c = 0; c < 6; c++) {           // do for every single cluster
+                for (int s = 0; s < 2; s++) {       // do for every sensor of cluster
+                    track_temps[cnt][c][s] = temps[s];      // put every sensor data in history array
+                    for (int i = 0; i<tracking_size; i++) {     // go through every history array element of sensors
+                        int32_t value = track_temps[i][c][s];
+                        // Check absence of reading / connection / response time (NaN/inf)
+                        if (isnan(value) || isinf(value)) {
+                            ui_msg = "No temperature sensor data";
                         }
-                        else if (value < 20) {
-                            ui_msg = "Cold warning"; 
-                        }
-                        else if (value > 40) {
-                            ui_msg = "Heat warning"; 
-                            severe_error = true;
-                        }
-                        else if (i+1<tracking_size) {
-                            // Check delta between readings (with next in history array, not for last element)
-                            if (fabs(value-track_temps[s][i+1]) > 2) {
-                                ui_msg = "Sudden temperature sensor difference";
-                                severe_error = true; 
+                        else {
+                            // Sanity check values
+                            if (value < 0 || value > 50) {
+                                ui_msg = "Invalid temperature sensor data"; 
                             }
-                        }   
-                    }  
+                            else if (value < 20) {
+                                ui_msg = "Cold warning"; 
+                            }
+                            else if (value > 40) {
+                                ui_msg = "Heat warning"; 
+                                severe_error = true;
+                            }
+                            else if (i+1<tracking_size) {
+                                // Check delta between readings (with next in history array, not for last element)
+                                if (fabs(value-track_temps[i+1][c][s]) > 2) {
+                                    ui_msg = "Sudden temperature sensor difference";
+                                    severe_error = true; 
+                                }
+                            }   
+                        }  
+                    }
                 }
             }
 
             // CHECKING HEATING BEHAVIOUR
             // Tracking heating current sensors
-            int track_currents[4][tracking_size] = { 0 }; //mA, tracking history of heating element currents (row for each sensor)
+            std::array<std::array<float, 4>, tracking_size> track_currents{};   //mA, tracking history of heating element currents (2D array with history of 4 sensors)
+            
             for (int s = 0; s < 4; s++) {       // do for every single sensor
-                track_currents[s][cnt] = currents[s]; // put every sensor data in history array
+                track_currents[cnt][s] = currents[s]; // put every sensor data in history array
                 for (int i = 0; i<tracking_size; i++) {     // go through every history array element of sensors
-                    int value = track_currents[s][i];
+                    float value = track_currents[i][s];
                     // Check absence of reading / connection / response time (NaN/inf)
                     if (isnan(value) || isinf(value)) {
                         ui_msg = "No heating current sensor data";
@@ -219,8 +221,8 @@ class SafetyControl {
                     }  
                 }
                 // Compare current with sent PWM signals
-                int heating_current = 10 * pwm_heating[s];    // WIP! mA, converting PWM to A of a single PWM channel, magic?
-                if (fabs(track_currents[s][cnt]-heating_current) > 500) {
+                float heating_pwm_current = 10 * pwm_heating[s];    // WIP! mA, converting PWM to A of a single PWM channel, magic?
+                if (fabs(track_currents[cnt][s]-heating_pwm_current) > 500) {
                     ui_msg = "(conversion is WIP!) Heating element current misaligns with sent PWM";
                     severe_error = true; 
                 }
