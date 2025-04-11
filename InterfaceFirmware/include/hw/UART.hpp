@@ -35,9 +35,9 @@ public:
     }
 
     void write(const char *data) {
-        gpio_put(PICO_DEFAULT_LED_PIN, true);
+        cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, true);
         uart_puts(instance, data);
-        gpio_put(PICO_DEFAULT_LED_PIN, false);
+        cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, false);
     }
 
     void on_uart_rx() {

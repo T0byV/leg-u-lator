@@ -8,15 +8,6 @@
 //#include <drivers/fram.hpp>
 #include <drivers/temp_sensor.hpp>
 
-UART* irq_userptrs[2] = { nullptr, nullptr };
-
-extern void on_uart0_irq() {
-    if (irq_userptrs[0]) irq_userptrs[0]->on_uart_rx();
-}
-
-extern void on_uart1_irq() {
-    if (irq_userptrs[1]) irq_userptrs[0]->on_uart_rx();
-}
 // See: https://www.raspberrypi.com/documentation/pico-sdk/high_level.html#detailed-description-8 for core interaction
 void core1_entry() {
     while (1)
@@ -25,7 +16,7 @@ void core1_entry() {
 
 int main() {
     stdio_init_all();
-    sleep_ms(3000);
+    sleep_ms(1000);
     printf("Hello world!\n");
 
     gpio_init(PICO_DEFAULT_LED_PIN);
@@ -55,16 +46,21 @@ int main() {
         {&bus0, 0x40, 1, 0.1006}  // Channel 4
     }};
 
-    UART mcu2_uart{};
+    UART uart_bus{};
 
-    bool s = true;
+    // bool s = false;
     while (true) {
-        gpio_put(PICO_DEFAULT_LED_PIN, s);
-        s = !s;
+        // gpio_put(PICO_DEFAULT_LED_PIN, s);
+        // s = !s;
 
-        printf("Cycle");
+        printf("Cycle start\n");
 
-        mcu2_uart.write("hello");
+        uart_bus.write("b47#");
+        uart_bus.write("c25452#");
+        uart_bus.write("d25000#");
+        // uart_bus.write("u26000#");
+        uart_bus.write("e3#");
+        uart_bus.write("w5#");
         // printf("%f %f %f %f %f\n", heating_power_sensors[0].read_bus_voltage(), heating_power_sensors[0].read_current(), heating_power_sensors[1].read_current(), heating_power_sensors[2].read_current(), heating_power_sensors[3].read_current());
         //printf("%f %f %f %f\n", heating_power_sensors[0].read_bus_voltage(), heating_power_sensors[0].read_shunt_voltage(), heating_power_sensors[0].read_current(), (float)heating_power_sensors[0].read_shunt_voltage() / (float)heating_power_sensors[0].read_current());
 
@@ -74,7 +70,6 @@ int main() {
         // printf("%d, %d, %d\n", time_us_32(), temps[0][0], temps[0][1]);
 
         // printf("%d,%d\n", time_us_32(), temps[0]);
-
-        sleep_ms(100);
+        sleep_ms(3000);
     }
 }
