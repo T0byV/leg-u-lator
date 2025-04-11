@@ -1,5 +1,5 @@
 #include <common.hpp>
-
+#include <iostream>
 #include "lwip/tcp.h"
 #include "lwip/apps/httpd.h"
 
@@ -9,6 +9,19 @@
 void core1_entry() {
     while(1)
         ;
+}
+
+bool connect_to_wifi(){
+    if (cyw43_arch_wifi_connect_timeout_ms("Your Wi-Fi SSID", "Your Wi-Fi Password", CYW43_AUTH_WPA2_AES_PSK, 30000)) {
+            printf("failed to connect.\n");
+            return false;
+        } else {
+            printf("Connected.\n");
+            // Read the ip address in a human readable way
+            uint8_t *ip_address = (uint8_t*)&(cyw43_state.netif[0].ip_addr.addr);
+            printf("IP address %d.%d.%d.%d\n", ip_address[0], ip_address[1], ip_address[2], ip_address[3]);
+            return true;
+        }
 }
 
 int main()
@@ -29,16 +42,17 @@ int main()
     cyw43_arch_enable_sta_mode();
 
     UART uart_bus{uart0, 16, 17};
-    
-    printf("Connecting to Wi-Fi...\n");
-    if (cyw43_arch_wifi_connect_timeout_ms("Your Wi-Fi SSID", "Your Wi-Fi Password", CYW43_AUTH_WPA2_AES_PSK, 30000)) {
-        printf("failed to connect.\n");
-        return 1;
-    } else {
-        printf("Connected.\n");
-        // Read the ip address in a human readable way
-        uint8_t *ip_address = (uint8_t*)&(cyw43_state.netif[0].ip_addr.addr);
-        printf("IP address %d.%d.%d.%d\n", ip_address[0], ip_address[1], ip_address[2], ip_address[3]);
+
+    printf("Attempting to establish a Wi-Fi connection...\n");
+    int attempts = 10;
+    for(int attempt = 0; attempt < attempts; attempt++){
+        if (connect_to_wifi()){
+            std::cout << "Succeeded on attempt " << attempt << std::endl;
+            break;
+        }
+        else {
+            std::cout << "Attempt " << attempt << " failed." << std::endl;
+        }
     }
 
     // Start lwip http server
