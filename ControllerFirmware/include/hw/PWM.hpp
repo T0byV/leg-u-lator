@@ -10,7 +10,7 @@ template<int N>
 class PWM {
     public:
         // Minimum frequency seems to be 5kHz
-        PWM(const std::array<uint,N>& pwm_pins, uint16_t max_duty_cycle = 40, uint16_t wrap_resolution = 100, uint32_t pwm_frequency_hz = 5000) : pwm_pins{pwm_pins}, wrap_resolution{wrap_resolution}
+        PWM(const std::array<uint,N>& pwm_pins, float max_duty_cycle = 1.0, uint16_t wrap_resolution = 5000, uint32_t pwm_frequency_hz = 5000) : pwm_pins{pwm_pins}, max_duty_cycle{max_duty_cycle}, wrap_resolution{wrap_resolution}
         {
             uint32_t clk_hz = clock_get_hz(clk_sys);
             float divider = static_cast<float>(clk_hz) / (wrap_resolution * pwm_frequency_hz);
@@ -32,21 +32,22 @@ class PWM {
             enable_all();
         }
 
-        void set_duty_cycle(uint pin, uint16_t duty_percentage) noexcept {
-            if (duty_percentage <= 0)
-                duty_percentage = 0;
-            if (duty_percentage >= 100)
-                duty_percentage = 100;
+        float set_duty_cycle(uint pin, float duty_cycle) noexcept {
+            if (duty_cycle <= 0.0)
+                duty_cycle = 0.0;
+            if (duty_cycle >= 1.0)
+                duty_cycle = 1.0;
     
-            uint level = wrap_resolution * duty_percentage * 0.01;
-            pwm_set_gpio_level(pin, level);
+            uint16_t wrap_corrected_duty_cycle = static_cast<uint16_t>(wrap_resolution * duty_cycle);
+            pwm_set_gpio_level(pin, wrap_corrected_duty_cycle);
+            return duty_cycle;
         }
 
-        void set_duty_cycle_safe(uint pin, uint16_t duty_percentage) noexcept {
-            if (duty_percentage > max_duty_cycle) {
-                duty_percentage = max_duty_cycle;
+        float set_duty_cycle_safe(uint pin, float duty_cycle) noexcept {
+            if (duty_cycle > max_duty_cycle) {
+                duty_cycle = max_duty_cycle;
             }
-            set_duty_cycle(pin, duty_percentage);
+            return set_duty_cycle(pin, duty_cycle);
         }
 
         void enable_all() {
@@ -60,6 +61,6 @@ class PWM {
 
     private:
         const std::array<uint, N>& pwm_pins;
-        uint16_t max_duty_cycle;
+        float max_duty_cycle;
         uint16_t wrap_resolution;
 };

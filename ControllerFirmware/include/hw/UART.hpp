@@ -13,7 +13,7 @@ extern class UART* irq_userptrs[2];
 void on_uart0_irq();
 void on_uart1_irq();
 
-constexpr std::size_t RX_BUFFER_LEN = 32;
+constexpr int RX_BUFFER_LEN = 32;
 class UART
 {
 public:
@@ -21,7 +21,7 @@ public:
     static inline UART* irq_userptrs[2] = { nullptr, nullptr };
 
 
-    UART(uart_inst_t *instance = uart0, uint8_t tx_pin = 0, uint8_t rx_pin = 1, uint baudrate = 115200) : instance{instance}
+    UART(uart_inst_t *instance = uart0, uint8_t tx_pin = 0, uint8_t rx_pin = 1, uint baudrate = 115200) : instance{instance} 
     {
         gpio_set_function(tx_pin, UART_FUNCSEL_NUM(instance, tx_pin));
         gpio_set_function(rx_pin, UART_FUNCSEL_NUM(instance, rx_pin));
@@ -83,22 +83,22 @@ public:
         // w: warning
         switch (key) {
             case 'b':
-                printf("UART_RX: BatPerc: %d%\n", value);
+                printf("UART_RX: BatPerc: %d\n", value);
                 break;
             case 'c':
-                printf("UART_RX: CurAvgMeasTemp: %d%\n", value);
+                printf("UART_RX: CurAvgMeasTemp: %d\n", value);
                 break;
             case 'd':
-                printf("UART_RX: CurSetTempControlMCU: %d%\n", value);
+                printf("UART_RX: CurSetTempControlMCU: %d\n", value);
                 break;
             case 'u':
                 printf("UART_RX: UpdateLegSetTemp: %d\n", value);
                 break;
             case 'e':
-                printf("UART_RX: ErrorMsg: %d%\n", value);
+                printf("UART_RX: ErrorMsg: %d\n", value);
                 break;
             case 'w':
-                printf("UART_RX: WarningMsg: %d%\n", value);
+                printf("UART_RX: WarningMsg: %d\n", value);
                 break;
             default:
                 printf("ERR: UART_RX: Unknown: {%c - %d}\n", key, value);

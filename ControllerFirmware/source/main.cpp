@@ -24,9 +24,10 @@ int main() {
 
     multicore_launch_core1(core1_entry);
 
+    float max_duty_cycle = 0.3;
     PWM<4> heating_pwm{
         {{6, 7, 8, 9}}, // GPIO pins used
-        40
+        max_duty_cycle
     };
     // EXAMPLE: heating_pwm.set_duty_cycle_safe(6, 40); sets pin 6 to 40% duty cycle
 
@@ -52,30 +53,32 @@ int main() {
     // bool s = false;
 
     float actuator_impedances[4] = {};
-    uint16_t calibration_duty_cycle = 10;
+    float calibration_duty_cycle = 0.3;
 
     printf("INFO: Calibrating\n");
     gpio_put(PICO_DEFAULT_LED_PIN, true);
     for (int i = 0; i < 4; i++)
     {
-        printf("%d\n", i);
+        printf("element %d: ", i);
+
         heating_pwm.set_duty_cycle_safe((i + 6), calibration_duty_cycle);
-        sleep_ms(4000);
+        sleep_ms(250);
         float bus_voltage_mv = heating_power_sensors[i].read_bus_voltage();
         float bus_current_iv = heating_power_sensors[i].read_current();
-        float impedance = bus_voltage_mv / bus_current_iv;
+        float impedance = (bus_voltage_mv * calibration_duty_cycle) / fabs(bus_current_iv);
         actuator_impedances[i] = impedance;
-        printf("element: %d, voltage: %dmV, current: %dmA, impedance: %.2f\n", i, bus_voltage_mv, bus_current_iv, impedance);
-        heating_pwm.set_duty_cycle_safe((i + 6), 0);
+        printf("voltage: %.2fmV, current: %.2fmA, impedance: %.2f\n", bus_voltage_mv, bus_current_iv, impedance);
+        heating_pwm.set_duty_cycle_safe((i + 6), 0.0);
     }
     gpio_put(PICO_DEFAULT_LED_PIN, false);
 
 
-    float desired_power_mw = 4000;
+    float desired_power_mw = 150;
     int calibration_cycle_counter = 0;
-    int calibration_after_cycles = 10;
+    int calibration_after_cycles = 20;
+    int cycle_duration_ms = 1000;
 
-    uint16_t set_duty_cycle = 5;
+    float set_duty_cycle[4] = {0.0, 0.0, 0.0, 0.0};
     while (true)
     {
         // gpio_put(PICO_DEFAULT_LED_PIN, s);
@@ -88,43 +91,44 @@ int main() {
             gpio_put(PICO_DEFAULT_LED_PIN, true);
             for (int i = 0; i < 4; i++)
             {
-                uint16_t old_duty_cycle = set_duty_cycle;
+                printf("element %d: ", i);
+                float old_duty_cycle = set_duty_cycle[i];
                 heating_pwm.set_duty_cycle_safe((i + 6), calibration_duty_cycle);
-                sleep_ms(1000);
+                sleep_ms(750);
                 float bus_voltage_mv = heating_power_sensors[i].read_bus_voltage();
                 float bus_current_iv = heating_power_sensors[i].read_current();
-                float impedance = (bus_voltage_mv ) / bus_current_iv;
+                float impedance = (bus_voltage_mv * calibration_duty_cycle) / fabs(bus_current_iv);
                 actuator_impedances[i] = impedance;
-                printf("element: %d, voltage: %dmV, current: %dmA, impedance: %.2f\n", i, bus_voltage_mv, bus_current_iv, impedance);
+                printf("voltage: %.2fmV, current: %.2fmA, impedance: %.2f\n", bus_voltage_mv, bus_current_iv, impedance);
                 heating_pwm.set_duty_cycle_safe((i + 6), old_duty_cycle);
             }
             gpio_put(PICO_DEFAULT_LED_PIN, false);
             calibration_cycle_counter = 0;
         }
         calibration_cycle_counter++;
-        sleep_ms(1000);
 
 
         for (int i = 0; i < 4; i++)
         {
-            float bus_voltage_mv = heating_power_sensors[i].read_bus_voltage();
+            float current = heating_power_sensors[i].read_current();
 
-            float measured_power_mw = 1000 * (bus_voltage_mv*bus_voltage_mv) / actuator_impedances[i];
+            float measured_power_mw = 0.001 * current * current * actuator_impedances[i];
             float delta_power_mw = desired_power_mw - measured_power_mw;
 
             // start controller
-            if (delta_power_mw < 0)
-                set_duty_cycle = 0;
-            else if (delta_power_mw > 2000)
-                set_duty_cycle = 50;
-            else if (delta_power_mw > 0)
-                set_duty_cycle = 20;
+            if (delta_power_mw <= 0.0)
+                set_duty_cycle[i] = set_duty_cycle[i] - 0.001;
+            else if (delta_power_mw > 0.0)
+                set_duty_cycle[i] = set_duty_cycle[i] + 0.001;
+            
+            if (set_duty_cycle[i] > max_duty_cycle) set_duty_cycle[i] = max_duty_cycle;
+            if (set_duty_cycle[i] < 0.0) set_duty_cycle[i] = 0.0;
             // end controller
-            printf("Delta: %d, DutyCycle: %d\n", i, set_duty_cycle);
-            heating_pwm.set_duty_cycle_safe((i + 6), set_duty_cycle);
+            float confirmed_cycle = heating_pwm.set_duty_cycle_safe((i + 6), set_duty_cycle[i]);
+            printf("Delta: %.2fmW, MeasPow: %.2fmW, DesiredPow: %.2fmW, current: %.2fmA, NewDutyCycle: %.3f, ConfirmedDutyCycle: %.3f\n", delta_power_mw, measured_power_mw, desired_power_mw, current, set_duty_cycle[i], confirmed_cycle);
         }
 
-        sleep_ms(1000);
+        sleep_ms(cycle_duration_ms);
 
         // uart_bus.write("b47#");
         // uart_bus.write("c25452#");
