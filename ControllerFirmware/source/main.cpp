@@ -29,6 +29,10 @@ int main() {
         {{6, 7, 8, 9}}, // GPIO pins used
         max_duty_cycle
     };
+
+    // std::array<PWM, 4> heating_pwm_channels = {{
+
+    // }}
     // EXAMPLE: heating_pwm.set_duty_cycle_safe(6, 40); sets pin 6 to 40% duty cycle
 
     SyncI2CMaster bus0{0, 20, 21, false};
@@ -62,7 +66,7 @@ int main() {
         printf("element %d: ", i);
 
         heating_pwm.set_duty_cycle_safe((i + 6), calibration_duty_cycle);
-        sleep_ms(250);
+        sleep_ms(750);
         float bus_voltage_mv = heating_power_sensors[i].read_bus_voltage();
         float bus_current_iv = heating_power_sensors[i].read_current();
         float impedance = (bus_voltage_mv * calibration_duty_cycle) / fabs(bus_current_iv);
@@ -79,6 +83,7 @@ int main() {
     int cycle_duration_ms = 1000;
 
     float set_duty_cycle[4] = {0.0, 0.0, 0.0, 0.0};
+    float confirmed_cycle[4] = {0.0, 0.0, 0.0, 0.0};
     while (true)
     {
         // gpio_put(PICO_DEFAULT_LED_PIN, s);
@@ -101,6 +106,7 @@ int main() {
                 actuator_impedances[i] = impedance;
                 printf("voltage: %.2fmV, current: %.2fmA, impedance: %.2f\n", bus_voltage_mv, bus_current_iv, impedance);
                 heating_pwm.set_duty_cycle_safe((i + 6), old_duty_cycle);
+                sleep_ms(750);
             }
             gpio_put(PICO_DEFAULT_LED_PIN, false);
             calibration_cycle_counter = 0;
@@ -110,9 +116,9 @@ int main() {
 
         for (int i = 0; i < 4; i++)
         {
-            float current = heating_power_sensors[i].read_current();
+            float current = (confirmed_cycle[i] * heating_power_sensors[i].read_bus_voltage());
 
-            float measured_power_mw = 0.001 * current * current * actuator_impedances[i];
+            float measured_power_mw = 0.001 * (current * current) / actuator_impedances[i];
             float delta_power_mw = desired_power_mw - measured_power_mw;
 
             // start controller
@@ -124,8 +130,8 @@ int main() {
             if (set_duty_cycle[i] > max_duty_cycle) set_duty_cycle[i] = max_duty_cycle;
             if (set_duty_cycle[i] < 0.0) set_duty_cycle[i] = 0.0;
             // end controller
-            float confirmed_cycle = heating_pwm.set_duty_cycle_safe((i + 6), set_duty_cycle[i]);
-            printf("Delta: %.2fmW, MeasPow: %.2fmW, DesiredPow: %.2fmW, current: %.2fmA, NewDutyCycle: %.3f, ConfirmedDutyCycle: %.3f\n", delta_power_mw, measured_power_mw, desired_power_mw, current, set_duty_cycle[i], confirmed_cycle);
+            confirmed_cycle[i] = heating_pwm.set_duty_cycle_safe((i + 6), set_duty_cycle[i]);
+            printf("Delta: %.2fmW, MeasPow: %.2fmW, DesiredPow: %.2fmW, current: %.2fmA, NewDutyCycle: %.3f, ConfirmedDutyCycle: %.3f\n", delta_power_mw, measured_power_mw, desired_power_mw, current, set_duty_cycle[i], confirmed_cycle[i]);
         }
 
         sleep_ms(cycle_duration_ms);
