@@ -16,7 +16,7 @@ void core1_entry() {
 
 int main() {
     stdio_init_all();
-    // sleep_ms(1000);
+    sleep_ms(5000);
     printf("Hello world!\n");
 
     gpio_init(PICO_DEFAULT_LED_PIN);
@@ -25,11 +25,12 @@ int main() {
     multicore_launch_core1(core1_entry);
 
     PWM<4> heating_pwm{
-        {{6, 7, 8, 9}} // GPIO pins used
+        {{6, 7, 8, 9}}, // GPIO pins used
+        40
     };
-    // EXAMPLE: heating_pwm.set_duty_cycle(6, 40); sets pin 6 to 40% duty cycle
+    // EXAMPLE: heating_pwm.set_duty_cycle_safe(6, 40); sets pin 6 to 40% duty cycle
 
-    SyncI2CMaster bus0{0, 4, 5, true};
+    SyncI2CMaster bus0{0, 20, 21, false};
     Sensor<6, 2> sensing{&bus0, {{
         {0x50, 0x58}, // 1 Red
         {0x51, 0x59}, // 2 Orange
@@ -49,18 +50,88 @@ int main() {
     UART uart_bus{uart1, 4, 5};
 
     // bool s = false;
-    while (true) {
+
+    float actuator_impedances[4] = {};
+    uint16_t calibration_duty_cycle = 10;
+
+    printf("INFO: Calibrating\n");
+    gpio_put(PICO_DEFAULT_LED_PIN, true);
+    for (int i = 0; i < 4; i++)
+    {
+        printf("%d\n", i);
+        heating_pwm.set_duty_cycle_safe((i + 6), calibration_duty_cycle);
+        sleep_ms(4000);
+        float bus_voltage_mv = heating_power_sensors[i].read_bus_voltage();
+        float bus_current_iv = heating_power_sensors[i].read_current();
+        float impedance = bus_voltage_mv / bus_current_iv;
+        actuator_impedances[i] = impedance;
+        printf("element: %d, voltage: %dmV, current: %dmA, impedance: %.2f\n", i, bus_voltage_mv, bus_current_iv, impedance);
+        heating_pwm.set_duty_cycle_safe((i + 6), 0);
+    }
+    gpio_put(PICO_DEFAULT_LED_PIN, false);
+
+
+    float desired_power_mw = 4000;
+    int calibration_cycle_counter = 0;
+    int calibration_after_cycles = 10;
+
+    uint16_t set_duty_cycle = 5;
+    while (true)
+    {
         // gpio_put(PICO_DEFAULT_LED_PIN, s);
         // s = !s;
-
+        
         printf("Cycle start\n");
 
-        uart_bus.write("b47#");
-        uart_bus.write("c25452#");
-        uart_bus.write("d25000#");
-        // uart_bus.write("u26000#");
-        uart_bus.write("e3#");
-        uart_bus.write("w5#");
+        if (calibration_cycle_counter >= calibration_after_cycles) {
+            printf("INFO: Calibrating\n");
+            gpio_put(PICO_DEFAULT_LED_PIN, true);
+            for (int i = 0; i < 4; i++)
+            {
+                uint16_t old_duty_cycle = set_duty_cycle;
+                heating_pwm.set_duty_cycle_safe((i + 6), calibration_duty_cycle);
+                sleep_ms(1000);
+                float bus_voltage_mv = heating_power_sensors[i].read_bus_voltage();
+                float bus_current_iv = heating_power_sensors[i].read_current();
+                float impedance = (bus_voltage_mv ) / bus_current_iv;
+                actuator_impedances[i] = impedance;
+                printf("element: %d, voltage: %dmV, current: %dmA, impedance: %.2f\n", i, bus_voltage_mv, bus_current_iv, impedance);
+                heating_pwm.set_duty_cycle_safe((i + 6), old_duty_cycle);
+            }
+            gpio_put(PICO_DEFAULT_LED_PIN, false);
+            calibration_cycle_counter = 0;
+        }
+        calibration_cycle_counter++;
+        sleep_ms(1000);
+
+
+        for (int i = 0; i < 4; i++)
+        {
+            float bus_voltage_mv = heating_power_sensors[i].read_bus_voltage();
+
+            float measured_power_mw = 1000 * (bus_voltage_mv*bus_voltage_mv) / actuator_impedances[i];
+            float delta_power_mw = desired_power_mw - measured_power_mw;
+
+            // start controller
+            if (delta_power_mw < 0)
+                set_duty_cycle = 0;
+            else if (delta_power_mw > 2000)
+                set_duty_cycle = 50;
+            else if (delta_power_mw > 0)
+                set_duty_cycle = 20;
+            // end controller
+            printf("Delta: %d, DutyCycle: %d\n", i, set_duty_cycle);
+            heating_pwm.set_duty_cycle_safe((i + 6), set_duty_cycle);
+        }
+
+        sleep_ms(1000);
+
+        // uart_bus.write("b47#");
+        // uart_bus.write("c25452#");
+        // uart_bus.write("d25000#");
+        // // uart_bus.write("u26000#");
+        // uart_bus.write("e3#");
+        // uart_bus.write("w5#");
         // printf("%f %f %f %f %f\n", heating_power_sensors[0].read_bus_voltage(), heating_power_sensors[0].read_current(), heating_power_sensors[1].read_current(), heating_power_sensors[2].read_current(), heating_power_sensors[3].read_current());
         //printf("%f %f %f %f\n", heating_power_sensors[0].read_bus_voltage(), heating_power_sensors[0].read_shunt_voltage(), heating_power_sensors[0].read_current(), (float)heating_power_sensors[0].read_shunt_voltage() / (float)heating_power_sensors[0].read_current());
 
@@ -70,6 +141,6 @@ int main() {
         // printf("%d, %d, %d\n", time_us_32(), temps[0][0], temps[0][1]);
 
         // printf("%d,%d\n", time_us_32(), temps[0]);
-        sleep_ms(3000);
+
     }
 }

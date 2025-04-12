@@ -30,7 +30,7 @@ public:
 
         setup_interrupts();
 
-        printf("UART bus initialised");
+        printf("UART bus initialised\n");
         uart_puts(instance, "UART bus initialised");
     }
 
