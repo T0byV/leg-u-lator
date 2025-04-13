@@ -8,12 +8,16 @@
 //#include <drivers/fram.hpp>
 #include <drivers/temp_sensor.hpp>
 #include <drivers/heating_element.hpp>
+#include <control/PIDController.h>
+#include <control/WeightedTemperaturePoints.hpp>
 
 // See: https://www.raspberrypi.com/documentation/pico-sdk/high_level.html#detailed-description-8 for core interaction
 void core1_entry() {
     while (1)
         ;
 }
+
+constexpr DELTA_MILLIKELVIN_MILLICELSIUS = 273150;
 
 int main() {
     stdio_init_all();
@@ -25,7 +29,12 @@ int main() {
 
     multicore_launch_core1(core1_entry);
 
+    const uint8_t number_of_heating_zones = 4;
+
     SyncI2CMaster bus0{0, 20, 21, false};
+
+    UART uart_bus{uart1, 4, 5};
+
     Sensor<6, 2> sensing{&bus0, {{
         {0x50, 0x58}, // 1 Red
         {0x51, 0x59}, // 2 Orange
@@ -34,8 +43,17 @@ int main() {
         {0x54, 0x5C}, // 5 Blue
         {0x55, 0x5D} // 6 Purple
     }}};
-    
-    std::array<INA219, 4> heating_power_sensors = {{
+
+    WeightedTemperaturePoints<6, 2, 6, 4> zone_temperatures{&sensing, {{
+        {0.90, 0.00, 0.00, 0.00},
+        {0.50, 0.34, 0.00, 0.00},
+        {0.50, 0.00, 0.45, 0.00},
+        {0.00, 0.23, 0.00, 0.45},
+        {0.00, 0.00, 0.15, 0.55},
+        {0.00, 0.43, 0.40, 0.00}
+    }}};
+
+    std::array<INA219, number_of_heating_zones> heating_power_sensors = {{
         {&bus0, 0x45, 1, 0.101}, // Channel 1
         {&bus0, 0x44, 1, 0.1012}, // Channel 2
         {&bus0, 0x41, 1, 0.1005}, // Channel 3
@@ -43,8 +61,7 @@ int main() {
     }};
 
     float max_duty_cycle = 0.2;
-
-    std::array<PWM, 4> heating_pwm_channels = {{
+    std::array<PWM, number_of_heating_zones> heating_pwm_channels = {{
         {6, max_duty_cycle},
         {7, max_duty_cycle},
         {8, max_duty_cycle},
@@ -53,26 +70,49 @@ int main() {
 
     float calibration_duty_cycle = 0.3;
     float max_power_mw_per_element = 2000;
-    std::array<HeatingElement, 4> heating_elements = {{
+    std::array<HeatingElement, number_of_heating_zones> heating_elements = {{
         {0, &heating_pwm_channels[0], &heating_power_sensors[0], max_power_mw_per_element, calibration_duty_cycle},
         {1, &heating_pwm_channels[1], &heating_power_sensors[1], max_power_mw_per_element, calibration_duty_cycle},
         {2, &heating_pwm_channels[2], &heating_power_sensors[2], max_power_mw_per_element, calibration_duty_cycle},
         {3, &heating_pwm_channels[3], &heating_power_sensors[3], max_power_mw_per_element, calibration_duty_cycle}
     }};
-
-    UART uart_bus{uart1, 4, 5};
+    
+    // PID parameters :
+    double Kp = 5.0, Ki = 0.0005, Kd = 45.0; 
+    double deadband = 0.5, baseline = 0.0, sampleTime = 1.0; 
+    double alphaTemp = 0.9, alphaDeriv = 0.5, maxPower = 40.0;   
+    
+    PIDController pidZones[number_of_heating_zones] = {
+        PIDController(Kp, Ki, Kd, deadband, baseline, sampleTime, alphaTemp, alphaDeriv, maxPower),
+        PIDController(Kp, Ki, Kd, deadband, baseline, sampleTime, alphaTemp, alphaDeriv, maxPower),
+        PIDController(Kp, Ki, Kd, deadband, baseline, sampleTime, alphaTemp, alphaDeriv, maxPower),
+        PIDController(Kp, Ki, Kd, deadband, baseline, sampleTime, alphaTemp, alphaDeriv, maxPower)
+    };
+    
+    // Example measured temperature [K], the processed sensor readouts should be here
+    // double sensorReadings[number_of_heating_zones] = {303.0, 303.0, 302.0, 302.0};
+    
+    for (int zone = 0; zone < number_of_heating_zones; zone++) {
+        double heaterPower = pidZones[zone].update(setpoint, sensorReadings[zone]);
+        std::cout << "Zone " << (zone + 1) << " heater power: " << heaterPower << " W" << std::endl;
+    }
+    
 
     // bool s = false;
 
     printf("First calibration\n");
-    for (int i = 0; i < 4; i++)
+    for (int i = 0; i < number_of_heating_zones; i++)
     {
         printf("%.2fohm\t", heating_elements[i].calibrate_impedance());
     }
     printf("\n");
 
 
-    float desired_power_mw = 150;
+    // Desired setpoint [K]
+    // double setpoint = 306.0;
+    double setpoint_mc = 30000; // 30k mCº
+
+    // float desired_power_mw = 150;
     int calibration_cycle_counter = 0;
     int calibration_after_cycles = 10;
     int cycle_duration_ms = 1000;
@@ -86,7 +126,7 @@ int main() {
 
         if (calibration_cycle_counter >= calibration_after_cycles) {
             printf("Calibrating\n");
-            for (int i = 0; i < 4; i++){
+            for (int i = 0; i < number_of_heating_zones; i++){
                 printf("%.2fohm\t", heating_elements[i].calibrate_impedance());
             }
             printf("\n");
@@ -94,9 +134,14 @@ int main() {
         }
         calibration_cycle_counter++;
 
+        std::array<float, number_of_heating_zones> zone_temperatures.get_temperatures();
 
-        for (int i = 0; i < 4; i++)
+        for (int i = 0; i < number_of_heating_zones; i++)
         {
+            double desired_power_mw = 1000 * pidZones[i].update(
+                0.001 * (DELTA_MILLIKELVIN_MILLICELSIUS + setpoint_mc),
+                0.001 * (DELTA_MILLIKELVIN_MILLICELSIUS + zone_temperatures[i])
+            );
             heating_elements[i].set_power_safe(desired_power_mw);
             sleep_ms(200);
             printf("%.2fmW\t", heating_elements[i].get_current_power());
