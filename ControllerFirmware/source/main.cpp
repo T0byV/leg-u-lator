@@ -89,15 +89,6 @@ int main() {
         PIDController(Kp, Ki, Kd, deadband, baseline, sampleTime, alphaTemp, alphaDeriv, maxPower)
     };
     
-    // Example measured temperature [K], the processed sensor readouts should be here
-    // double sensorReadings[number_of_heating_zones] = {303.0, 303.0, 302.0, 302.0};
-    
-    // for (int zone = 0; zone < number_of_heating_zones; zone++) {
-    //     double heaterPower = pidZones[zone].update(setpoint, sensorReadings[zone]);
-    //     std::cout << "Zone " << (zone + 1) << " heater power: " << heaterPower << " W" << std::endl;
-    // }
-    
-
     // bool s = false;
 
     printf("First calibration\n");
@@ -108,10 +99,8 @@ int main() {
     printf("\n");
 
 
-    // Desired setpoint [K]
-    // double setpoint = 306.0;
+    
     double setpoint_mc = 30000; // 30k mCº
-
     // float desired_power_mw = 150;
     int calibration_cycle_counter = 0;
     int calibration_after_cycles = 10;
