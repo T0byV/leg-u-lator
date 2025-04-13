@@ -52,6 +52,6 @@ class PWM {
 
             uint16_t wrap_corrected_duty_cycle = static_cast<uint16_t>(wrap_resolution * new_duty_cycle);
             pwm_set_gpio_level(gpio_pin, wrap_corrected_duty_cycle);
-            return new_duty_cycle;
+            return (static_cast<float>(wrap_corrected_duty_cycle) / static_cast<float>(wrap_resolution));
         }
 };
