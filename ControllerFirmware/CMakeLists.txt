@@ -53,5 +53,7 @@ target_include_directories(ControllerFirmware PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}
 )
 
+target_compile_options(ControllerFirmware PRIVATE -Wall -Wextra)
+
 pico_add_extra_outputs(ControllerFirmware)
 

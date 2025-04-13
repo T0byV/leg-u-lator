@@ -6,52 +6,52 @@
 
 #include <array>
 
-template<int N>
 class PWM {
     public:
         // Minimum frequency seems to be 5kHz
-        PWM(const std::array<uint,N>& pwm_pins, uint16_t wrap_resolution = 100, uint32_t pwm_frequency_hz = 5000) : pwm_pins{pwm_pins}, wrap_resolution{wrap_resolution}
+        PWM(const uint gpio_pin, float max_duty_cycle = 1.0, uint16_t wrap_resolution = 5000, uint32_t pwm_frequency_hz = 5000) : gpio_pin{gpio_pin}, max_duty_cycle{max_duty_cycle}, wrap_resolution{wrap_resolution}
         {
             uint32_t clk_hz = clock_get_hz(clk_sys);
             float divider = static_cast<float>(clk_hz) / (wrap_resolution * pwm_frequency_hz);
 
-            for (uint pin : pwm_pins)
-            {
-                gpio_set_function(pin, GPIO_FUNC_PWM);
-                uint slice_num = pwm_gpio_to_slice_num(pin);
+            gpio_set_function(gpio_pin, GPIO_FUNC_PWM);
+            uint slice_num = pwm_gpio_to_slice_num(gpio_pin);
 
-                pwm_set_clkdiv(slice_num, divider);
+            pwm_set_clkdiv(slice_num, divider);
 
-                pwm_set_wrap(slice_num, wrap_resolution);
+            pwm_set_wrap(slice_num, wrap_resolution);
 
-                // Initialize to 0% duty cycle
-                pwm_set_gpio_level(pin, 0);
-            }
+            // Initialize to 0% duty cycle
+            pwm_set_gpio_level(gpio_pin, current_set_duty_cycle);
 
-            // Only enable once we're sure all pins are initaliased at 0% duty-cycle
-            enable_all();
+            pwm_set_enabled(pwm_gpio_to_slice_num(gpio_pin), true);
         }
 
-        void set_duty_cycle(uint pin, uint16_t duty_percentage) noexcept {
-            if (duty_percentage <= 0)
-                duty_percentage = 0;
-            if (duty_percentage >= 100)
-                duty_percentage = 100;
-    
-            uint level = wrap_resolution * duty_percentage * 0.01;
-            pwm_set_gpio_level(pin, level);
+        float set_duty_cycle_safe(float new_duty_cycle) noexcept {
+            if (new_duty_cycle > max_duty_cycle) {
+                new_duty_cycle = max_duty_cycle;
+            }    
+            return set_duty_cycle(new_duty_cycle);
         }
 
-        void enable_all() {
-            for (uint pin : pwm_pins)
-                pwm_set_enabled(pwm_gpio_to_slice_num(pin), true);
-        }
-        void disable_all() {
-            for (uint pin : pwm_pins)
-                pwm_set_enabled(pwm_gpio_to_slice_num(pin), false);
+        float get_current_set_duty_cycle() {
+            return current_set_duty_cycle;
         }
 
     private:
-        const std::array<uint, N>& pwm_pins;
+        uint gpio_pin;
+        float max_duty_cycle;
+        float current_set_duty_cycle = 0.0;
         uint16_t wrap_resolution;
+
+        float set_duty_cycle(float new_duty_cycle) noexcept {
+            if (new_duty_cycle <= 0.0) new_duty_cycle = 0.0;
+            if (new_duty_cycle >= 1.0) new_duty_cycle = 1.0;
+
+            current_set_duty_cycle = new_duty_cycle;
+
+            uint16_t wrap_corrected_duty_cycle = static_cast<uint16_t>(wrap_resolution * new_duty_cycle);
+            pwm_set_gpio_level(gpio_pin, wrap_corrected_duty_cycle);
+            return new_duty_cycle;
+        }
 };
