@@ -54,10 +54,10 @@ int main() {
     float calibration_duty_cycle = 0.3;
     float max_power_mw_per_element = 2000;
     std::array<HeatingElement, 4> heating_elements = {{
-        {0, heating_pwm_channels[0], heating_power_sensors[0], max_power_mw_per_element, calibration_duty_cycle},
-        {1, heating_pwm_channels[1], heating_power_sensors[1], max_power_mw_per_element, calibration_duty_cycle},
-        {2, heating_pwm_channels[2], heating_power_sensors[2], max_power_mw_per_element, calibration_duty_cycle},
-        {3, heating_pwm_channels[3], heating_power_sensors[3], max_power_mw_per_element, calibration_duty_cycle}
+        {0, &heating_pwm_channels[0], &heating_power_sensors[0], max_power_mw_per_element, calibration_duty_cycle},
+        {1, &heating_pwm_channels[1], &heating_power_sensors[1], max_power_mw_per_element, calibration_duty_cycle},
+        {2, &heating_pwm_channels[2], &heating_power_sensors[2], max_power_mw_per_element, calibration_duty_cycle},
+        {3, &heating_pwm_channels[3], &heating_power_sensors[3], max_power_mw_per_element, calibration_duty_cycle}
     }};
 
     UART uart_bus{uart1, 4, 5};
