@@ -17,7 +17,7 @@ void core1_entry() {
         ;
 }
 
-constexpr DELTA_MILLIKELVIN_MILLICELSIUS = 273150;
+constexpr float DELTA_MILLIKELVIN_MILLICELSIUS = 273150.0;
 
 int main() {
     stdio_init_all();
@@ -92,10 +92,10 @@ int main() {
     // Example measured temperature [K], the processed sensor readouts should be here
     // double sensorReadings[number_of_heating_zones] = {303.0, 303.0, 302.0, 302.0};
     
-    for (int zone = 0; zone < number_of_heating_zones; zone++) {
-        double heaterPower = pidZones[zone].update(setpoint, sensorReadings[zone]);
-        std::cout << "Zone " << (zone + 1) << " heater power: " << heaterPower << " W" << std::endl;
-    }
+    // for (int zone = 0; zone < number_of_heating_zones; zone++) {
+    //     double heaterPower = pidZones[zone].update(setpoint, sensorReadings[zone]);
+    //     std::cout << "Zone " << (zone + 1) << " heater power: " << heaterPower << " W" << std::endl;
+    // }
     
 
     // bool s = false;
@@ -134,13 +134,13 @@ int main() {
         }
         calibration_cycle_counter++;
 
-        std::array<float, number_of_heating_zones> zone_temperatures.get_temperatures();
+        std::array<float, number_of_heating_zones> zone_temperatures_data_mc = zone_temperatures.get_temperatures();
 
         for (int i = 0; i < number_of_heating_zones; i++)
         {
             double desired_power_mw = 1000 * pidZones[i].update(
                 0.001 * (DELTA_MILLIKELVIN_MILLICELSIUS + setpoint_mc),
-                0.001 * (DELTA_MILLIKELVIN_MILLICELSIUS + zone_temperatures[i])
+                0.001 * (DELTA_MILLIKELVIN_MILLICELSIUS + zone_temperatures_data_mc[i])
             );
             heating_elements[i].set_power_safe(desired_power_mw);
             sleep_ms(200);

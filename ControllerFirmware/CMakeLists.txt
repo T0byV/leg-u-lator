@@ -35,7 +35,7 @@ pico_sdk_init()
 
 # Add executable. Default name is the project name, version 0.1
 include_directories(include/)
-add_executable(ControllerFirmware source/main.cpp )
+add_executable(ControllerFirmware source/main.cpp source/control/PIDController.cpp)
 
 pico_set_program_name(ControllerFirmware "ControllerFirmware")
 pico_set_program_version(ControllerFirmware "0.1")
