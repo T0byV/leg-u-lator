@@ -22,22 +22,30 @@ void core1_entry() {
 
 constexpr float DELTA_MILLIKELVIN_MILLICELSIUS = 273150.0;
 
+constexpr bool info = true;
+constexpr bool debug = false;
+
 int main() {
     stdio_init_all();
     sleep_ms(5000);
-    printf("Hello world!\n");
+    if (info) printf("Controller startup.\n");
 
+    if (debug) printf("Init LED pin.\n");
     gpio_init(PICO_DEFAULT_LED_PIN);
     gpio_set_dir(PICO_DEFAULT_LED_PIN, GPIO_OUT);
 
+    if (debug) printf("Init multicore.\n");
     multicore_launch_core1(core1_entry);
 
     const uint8_t number_of_heating_zones = 4;
 
+    if (debug) printf("Init I2C bus.\n");
     SyncI2CMaster bus0{0, 20, 21, false};
 
+    if (debug) printf("Init UART bus.\n");
     UART uart_bus{uart1, 4, 5};
 
+    if (info) printf("Init temperature sensors.\n");
     Sensor<6, 2> sensing{&bus0, {{
         {0x50, 0x58}, // 1 Red
         {0x51, 0x59}, // 2 Orange
@@ -47,6 +55,7 @@ int main() {
         {0x55, 0x5D} // 6 Purple
     }}};
 
+    if (debug) printf("Setup zone temperature conversion.\n");
     WeightedTemperaturePoints<6, 2, 6, 4> zone_temperatures{&sensing, {{
         {0.90, 0.00, 0.00, 0.00},
         {0.50, 0.34, 0.00, 0.00},
@@ -56,6 +65,7 @@ int main() {
         {0.00, 0.43, 0.40, 0.00}
     }}};
 
+    if (info) printf("Init heating power sensors.\n");
     std::array<INA219, number_of_heating_zones> heating_power_sensors = {{
         {&bus0, 0x45, 1, 0.101}, // Channel 1
         {&bus0, 0x44, 1, 0.1012}, // Channel 2
@@ -63,20 +73,13 @@ int main() {
         {&bus0, 0x40, 1, 0.1006}  // Channel 4
     }};
   
-    // Battery processing, to be moved somewhere
-    Battery bat;                                                    // Initialize battery data processing
-    //bat.startup(float powerdata_voltage);                           // Initialize battery data, needs some I2C magic measured voltage in mV
+    if (info) printf("Init heating power sensors.\n");
+    Battery bat;
+    // bat.startup()
 
-    //bat.update_soc(float powerdata_voltage, float powerdata_current); // Every few seconds: Update battery SoC estimate, needs some I2C magic measured voltage [mV] and current [mA]
-    //bat.estimate_life(float pwr_usage_now);                         // Every few seconds: Update estimated battery hours left, needs estimated power usage from feedback model
-
-    // Safety controller, to be moved somewhere
     SafetyControl safety;
-    //safety.check_startup(bool i2c_status_power, bool i2c_status_sensorsheating, bool uart_status_ui);         // Check startup connection errors, needs a status boolean of the two I2C lines and UART line
-    //safety.check_safety(bool i2c_power, float powerdata_current, float powerdata_voltage, bool i2c_sensorsheating, const std::array<std::array<int32_t, 2>, 6>& temps, const std::array<float, 4>& currents, float pwr_usage_now, const std::array<float, 4>& pwm_heating, int bat_soc, bool uart_ui);   // Every few seconds: Checks for safety concerns, uses basically all data available                                                                                 // Every few seconds: Check for safety concerns
-    //safety.alarm(bool severe_error);                                                                          // WIP: behaviour when the safety controller has raised the severe error flag
-    //cout << "UI message after safety check + severe flag: " << safety.ui_msg << " - " << safety.severe_error << "\n";         // debugging line
-  
+
+
     float max_duty_cycle = 0.2;
     std::array<PWM, number_of_heating_zones> heating_pwm_channels = {{
         {6, max_duty_cycle},
@@ -123,11 +126,20 @@ int main() {
     int calibration_after_cycles = 10;
     int cycle_duration_ms = 1000;
 
+    bool s = true;
+    while (true)
+    {
+        gpio_put(PICO_DEFAULT_LED_PIN, s);
+        s = !s;
+        sleep_ms(1000);
+    }
+    return 0;
     while (true)
     {
         // gpio_put(PICO_DEFAULT_LED_PIN, s);
         // s = !s;
-        
+            //bat.update_soc(float powerdata_voltage, float powerdata_current); // Every few seconds: Update battery SoC estimate, needs some I2C magic measured voltage [mV] and current [mA]
+            //bat.estimate_life(float pwr_usage_now);                         // Every few seconds: Update estimated battery hours left, needs estimated power usage from feedback model
         printf("Cycle start\n");
 
         if (calibration_cycle_counter >= calibration_after_cycles) {
