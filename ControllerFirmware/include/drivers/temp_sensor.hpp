@@ -18,12 +18,15 @@ class PJ85775 {
     }
 
     // If conversion has not been started yet, starts conversion
-    int32_t block_for_conversion() noexcept {
+    int32_t block_for_conversion(uint16_t timeout_ms = 100) noexcept {
         if(!_conversion_running)
             begin_conversion();
         
-        while((read_reg(reg_setup) & (1 << 8)) == 0)
-            ;
+        auto time_timeout = time_us_32() + 1000 * timeout_ms;
+        while((read_reg(reg_setup) & (1 << 8)) == 0) {
+            if(time_us_32() > time_timeout)
+                return INT32_MAX;
+        }
 
         auto frac = read_reg(reg_data);
         _conversion_running = false;

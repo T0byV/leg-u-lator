@@ -37,7 +37,7 @@ WIP!
 
 #include <common.hpp>
 
-#include <cmath>        // for using floor and stuff
+#include <math.h>        // for using floor and stuff
 #include <array>        // for using arrays
 
 class SafetyControl {
@@ -170,11 +170,11 @@ class SafetyControl {
             std::array<std::array<std::array<int32_t, 2>, 6>, tracking_size> track_temps{};     //degrees C, tracking history of temperature sensors (3D: tracking 6 clusters, each containing 2 sensors)
             for (int c = 0; c < 6; c++) {           // do for every single cluster
                 for (int s = 0; s < 2; s++) {       // do for every sensor of cluster
-                    track_temps[cnt][c][s] = temps[s];      // put every sensor data in history array
+                    track_temps[cnt][c][s] = temps[c][s];      // put every sensor data in history array
                     for (int i = 0; i<tracking_size; i++) {     // go through every history array element of sensors
                         int32_t value = track_temps[i][c][s];
                         // Check absence of reading / connection / response time (NaN/inf)
-                        if (isnan(value) || isinf(value)) {
+                        if (value == INT16_MAX) {
                             ui_msg = "No temperature sensor data";
                         }
                         else {

@@ -93,7 +93,7 @@ class Battery {
 
             // subtract used energy from SoC estimate
             float mah_consumed = powerdata_current * delta_time;        // consumed mAh, [mAh] = [mA] * [h]
-            soc_mah = soc_mah - ceil(powerdata_current * delta_time);   // subtract consumed mAh, [mAh] = [mA] * [h] from leftover mAh
+            soc_mah = soc_mah - ceil(mah_consumed);   // subtract consumed mAh, [mAh] = [mA] * [h] from leftover mAh
             soc = soc_mah / capacity * 100;                             // %, updated soc estimate, [%] = [mAh] / [mAh] * 100
             if (soc < 0) { soc = 0;}        // limit soc to 0 and 100%
             if (soc > 100) { soc = 100;}    // limit soc to 0 and 100%
