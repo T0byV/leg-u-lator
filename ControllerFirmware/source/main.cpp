@@ -128,10 +128,13 @@ int main() {
     };
     
     if (info) printf("First calibration\n");
-    for (int i = 0; i < number_of_heating_zones; i++)
-    {
-        if (info) printf("%.2fohm\t", heating_elements[i].calibrate_impedance());
+    if (csv_output) printf("FCAL: ");
+    for (int i = 0; i < number_of_heating_zones; i++){
+        float new_impedance = heating_elements[i].calibrate_impedance();
+        if (info) printf("%.2fohm\t", new_impedance);
+        if (csv_output) printf("%.2f,", new_impedance);
     }
+    if (csv_output) printf("\n");
     if (info) printf("\n\n");
 
     double setpoint_mc = 30000; // 30k mCº
@@ -152,18 +155,23 @@ int main() {
         //safety.check_safety(bool i2c_power, float powerdata_current, float powerdata_voltage, bool i2c_sensorsheating, const std::array<std::array<int32_t, 2>, 6>& temps, const std::array<float, 4>& currents, float pwr_usage_now, const std::array<float, 4>& pwm_heating, int bat_soc, bool uart_ui);   // Every few seconds: Checks for safety concerns, uses basically all data available                                                                                 // Every few seconds: Check for safety concerns
 
         if (calibration_cycle_counter >= calibration_after_cycles) {
-            printf("Calibrating\n");
+            if (info) printf("Calibrating\n");
+            // "CAL: imp1,imp2,imp3,imp4\n"
+            if (csv_output) printf("CAL: ");
             for (int i = 0; i < number_of_heating_zones; i++){
                 float new_impedance = heating_elements[i].calibrate_impedance();
                 if (info) printf("%.2fohm\t", new_impedance);
+                if (csv_output) printf("%.2f,", new_impedance);
             }
-            if (info) printf("\n");
+            if (info || csv_output) printf("\n");
             calibration_cycle_counter = 0;
         }
         calibration_cycle_counter++;
 
+        // "NORM: despow1,actpow1,zonetemp1,despow2,actpow2,zonetemp2,despow3,actpow3,zonetemp3,despow4,actpow4,zonetemp4\n"
+        if (csv_output) printf("NORM: ");
         std::array<float, number_of_heating_zones> zone_temperatures_data_mc = zone_temperatures.get_temperatures();
-
+    
         for (int i = 0; i < number_of_heating_zones; i++)
         {
             double desired_power_mw = 1000 * pidZones[i].update(
@@ -173,10 +181,12 @@ int main() {
             desired_power_mw = 150;
             heating_elements[i].set_power_safe(desired_power_mw);
             sleep_ms(200);
-            if (info) printf("%.2fmW[desired:%.2fmW]\t", heating_elements[i].get_current_power(), desired_power_mw);
+            float actual_power = heating_elements[i].get_current_power();
+            if (csv_output) printf("%.3f,%.3f,%.3f,", desired_power_mw, actual_power, zone_temperatures_data_mc[i]);
+            if (info) printf("%.2fmW[desired:%.2fmW]\t", actual_power, desired_power_mw);
         }
-        printf("\n");
 
+        if (info || csv_output) printf("\n");
         sleep_ms(cycle_duration_ms);
     }
 }
