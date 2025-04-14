@@ -23,7 +23,9 @@ class PWM {
 
             // Initialize to 0% duty cycle
             pwm_set_gpio_level(gpio_pin, current_set_duty_cycle);
+        }
 
+        void enable() {
             pwm_set_enabled(pwm_gpio_to_slice_num(gpio_pin), true);
         }
 
