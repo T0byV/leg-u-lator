@@ -29,7 +29,7 @@ void core1_entry() {
 
 constexpr float DELTA_MILLIKELVIN_MILLICELSIUS = 273150.0;
 
-void set_power_cutoff(bool enable) {
+void enable_heating_power(bool enable) {
     gpio_put(power_cutoff_switch_gpio, enable);
 }
 
@@ -46,7 +46,7 @@ int main() {
     gpio_init(power_cutoff_switch_gpio);
     gpio_set_dir(power_cutoff_switch_gpio, GPIO_OUT);
     gpio_pull_down(power_cutoff_switch_gpio);
-    set_power_cutoff(true);
+    enable_heating_power(true); // Disable cutoff switch
 
     if (debug) printf("Init multicore.\n");
     multicore_launch_core1(core1_entry);
