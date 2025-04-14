@@ -14,6 +14,12 @@
 #include <functions/powerdata.hpp>
 #include <functions/safetycheck.hpp>
 
+constexpr uint buzzer_gpio = 26;
+constexpr uint heatingzone1_gpio= 6;
+constexpr uint heatingzone2_gpio = 7;
+constexpr uint heatingzone3_gpio = 8;
+constexpr uint heatingzone4_gpio = 9;
+
 // See: https://www.raspberrypi.com/documentation/pico-sdk/high_level.html#detailed-description-8 for core interaction
 void core1_entry() {
     while (1)
@@ -69,37 +75,38 @@ int main() {
         {&bus0, 0x41, 1, 0.1005}, // Channel 3
         {&bus0, 0x40, 1, 0.1006}  // Channel 4
     }};
-  
-    if (info) printf("Init battery voltage processing.\n");
-    Battery bat;
-    // bat.startup()
-
-    if (info) printf("Init safety controller.\n");
-    SafetyControl safety;
-    // safety.check_startup(bool i2c_status_power, bool i2c_status_sensorsheating, bool uart_status_ui);
 
     if (debug) printf("Init PWM channels heating zones.\n");
-    float max_duty_cycle = 0.2;
+    float max_duty_cycle = 0.3;
     std::array<PWM, number_of_heating_zones> heating_pwm_channels = {{
-        {6, max_duty_cycle},
-        {7, max_duty_cycle},
-        {8, max_duty_cycle},
-        {9, max_duty_cycle}
+        {heatingzone1_gpio, max_duty_cycle},
+        {heatingzone2_gpio, max_duty_cycle},
+        {heatingzone3_gpio, max_duty_cycle},
+        {heatingzone4_gpio, max_duty_cycle}
     }};
     for (int i = 0; i < 4; i++) {
         heating_pwm_channels[i].enable();
     }
 
     if (debug) printf("Init PWM for buzzer.\n");
-    PWM buzzer = {22, 0.5};
+    PWM buzzer = {buzzer_gpio, 0.5};
     buzzer.enable();
     buzzer.set_duty_cycle_safe(0.5);
-    sleep_ms(1000);
+    sleep_ms(400);
     buzzer.set_duty_cycle_safe(0.0);
+
+  
+    if (info) printf("Init battery voltage processing.\n");
+    Battery bat;
+    // bat.startup()
+
+    if (info) printf("Init safety controller.\n");
+    // SafetyControl safety{*uart_bus, buzzer};
+    // safety.check_startup(bool i2c_status_power, bool i2c_status_sensorsheating, bool uart_status_ui);
 
     if (info) printf("Init heating zones (PWM + sensors).\n");
     float calibration_duty_cycle = 0.3;
-    float max_power_mw_per_element = 2000;
+    float max_power_mw_per_element = 200.0;
     std::array<HeatingElement, number_of_heating_zones> heating_elements = {{
         {0, &heating_pwm_channels[0], &heating_power_sensors[0], max_power_mw_per_element, calibration_duty_cycle},
         {1, &heating_pwm_channels[1], &heating_power_sensors[1], max_power_mw_per_element, calibration_duty_cycle},
@@ -125,20 +132,20 @@ int main() {
     {
         if (info) printf("%.2fohm\t", heating_elements[i].calibrate_impedance());
     }
-    if (info) printf("\n");
+    if (info) printf("\n\n");
 
     double setpoint_mc = 30000; // 30k mCº
     int calibration_cycle_counter = 0;
     int calibration_after_cycles = 10;
     int cycle_duration_ms = 1000;
-    bool s = true;
 
     if (info) printf("Starting main loop\n");
     while (true)
     {
         if (info) printf("New cycle: ");
-        gpio_put(PICO_DEFAULT_LED_PIN, s);
-        s = !s;
+        gpio_put(PICO_DEFAULT_LED_PIN, true);
+        sleep_ms(100);
+        gpio_put(PICO_DEFAULT_LED_PIN, false);
 
         //bat.update_soc(float powerdata_voltage, float powerdata_current); // Every few seconds: Update battery SoC estimate, needs some I2C magic measured voltage [mV] and current [mA]
         //bat.estimate_life(float pwr_usage_now);                         // Every few seconds: Update estimated battery hours left, needs estimated power usage from feedback model
@@ -163,9 +170,10 @@ int main() {
                 0.001 * (DELTA_MILLIKELVIN_MILLICELSIUS + setpoint_mc),
                 0.001 * (DELTA_MILLIKELVIN_MILLICELSIUS + zone_temperatures_data_mc[i])
             );
+            desired_power_mw = 150;
             heating_elements[i].set_power_safe(desired_power_mw);
             sleep_ms(200);
-            if (info) printf("%.2fmW\t", heating_elements[i].get_current_power());
+            if (info) printf("%.2fmW[desired:%.2fmW]\t", heating_elements[i].get_current_power(), desired_power_mw);
         }
         printf("\n");
 
