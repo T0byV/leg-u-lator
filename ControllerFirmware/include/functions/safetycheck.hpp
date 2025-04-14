@@ -294,6 +294,6 @@ class SafetyControl {
                 buzzer_pwm->set_duty_cycle_safe(50);
             }
 
-            uart->tx_error(msg_idx);
+            uart->tx_error_or_warning(severe_error, msg_idx);
         }
 };

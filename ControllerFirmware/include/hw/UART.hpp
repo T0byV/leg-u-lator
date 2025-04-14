@@ -34,9 +34,13 @@ public:
         uart_puts(instance, "UART bus initialised");
     }
 
-    void tx_error(int idx) {
+    void tx_error_or_warning(bool error, int idx) {
         char buf[16];
-        snprintf(buf, 16, "E%d", idx);
+
+        if(error)
+            snprintf(buf, 16, "e%d", idx);
+        else
+            snprintf(buf, 16, "w%d", idx);
 
         write(buf);
     }
