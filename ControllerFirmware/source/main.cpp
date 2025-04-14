@@ -14,6 +14,7 @@
 #include <functions/powerdata.hpp>
 #include <functions/safetycheck.hpp>
 
+constexpr uint power_cutoff_switch_gpio = 0;
 constexpr uint buzzer_gpio = 26;
 constexpr uint heatingzone1_gpio= 6;
 constexpr uint heatingzone2_gpio = 7;
@@ -28,6 +29,10 @@ void core1_entry() {
 
 constexpr float DELTA_MILLIKELVIN_MILLICELSIUS = 273150.0;
 
+void set_power_cutoff(bool enable) {
+    gpio_put(power_cutoff_switch_gpio, enable);
+}
+
 int main() {
     stdio_init_all();
     sleep_ms(5000);
@@ -36,6 +41,12 @@ int main() {
     if (debug) printf("Init LED pin.\n");
     gpio_init(PICO_DEFAULT_LED_PIN);
     gpio_set_dir(PICO_DEFAULT_LED_PIN, GPIO_OUT);
+
+    if (debug) printf("Init power cutoff switch.\n");
+    gpio_init(power_cutoff_switch_gpio);
+    gpio_set_dir(power_cutoff_switch_gpio, GPIO_OUT);
+    gpio_pull_down(power_cutoff_switch_gpio);
+    set_power_cutoff(true);
 
     if (debug) printf("Init multicore.\n");
     multicore_launch_core1(core1_entry);
