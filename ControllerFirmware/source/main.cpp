@@ -149,10 +149,9 @@ int main() {
         gpio_put(PICO_DEFAULT_LED_PIN, true);
         sleep_ms(100);
         gpio_put(PICO_DEFAULT_LED_PIN, false);
-
+        
         //bat.update_soc(float powerdata_voltage, float powerdata_current); // Every few seconds: Update battery SoC estimate, needs some I2C magic measured voltage [mV] and current [mA]
         //bat.estimate_life(float pwr_usage_now);                         // Every few seconds: Update estimated battery hours left, needs estimated power usage from feedback model
-        //safety.check_safety(bool i2c_power, float powerdata_current, float powerdata_voltage, bool i2c_sensorsheating, const std::array<std::array<int32_t, 2>, 6>& temps, const std::array<float, 4>& currents, float pwr_usage_now, const std::array<float, 4>& pwm_heating, int bat_soc, bool uart_ui);   // Every few seconds: Checks for safety concerns, uses basically all data available                                                                                 // Every few seconds: Check for safety concerns
 
         if (calibration_cycle_counter >= calibration_after_cycles) {
             if (info) printf("Calibrating\n");
@@ -171,7 +170,25 @@ int main() {
         // "NORM: despow1,actpow1,zonetemp1,despow2,actpow2,zonetemp2,despow3,actpow3,zonetemp3,despow4,actpow4,zonetemp4\n"
         if (csv_output) printf("NORM: ");
         std::array<float, number_of_heating_zones> zone_temperatures_data_mc = zone_temperatures.get_temperatures();
-    
+
+        //!!!!!!!UNCOMMENT WHEN UI IS DONE!!!!!!!!!!!!!
+        /*setpoint_mc = uart_bus.get_current_set_temp();
+
+        {
+            float avg = 0;
+            for(auto temp : zone_temperatures_data_mc)
+                avg += temp;
+            avg /= number_of_heating_zones;
+
+            uart_bus.send_ui_update(bat.soc, avg, setpoint_mc);
+        }*/
+       //!!!!!! END OF UNCOMMENT WHEN UI IS DONE!!!!!!!!
+        
+
+        // Every few seconds: Checks for safety concerns, uses basically all data available
+        // Every few seconds: Check for safety concerns
+        //safety.check_safety(bool i2c_power, float powerdata_current, float powerdata_voltage, bool i2c_sensorsheating, const std::array<std::array<int32_t, 2>, 6>& temps, const std::array<float, 4>& currents, float pwr_usage_now, const std::array<float, 4>& pwm_heating, int bat_soc, bool uart_ui);
+
         for (int i = 0; i < number_of_heating_zones; i++)
         {
             double desired_power_mw = 1000 * pidZones[i].update(

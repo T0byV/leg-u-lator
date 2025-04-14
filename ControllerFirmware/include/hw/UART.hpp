@@ -35,14 +35,18 @@ public:
     }
 
     void tx_error_or_warning(bool error, int idx) {
-        char buf[16];
+        auto tx = [&](char cmd, int v) {char buf[16]; snprintf(buf, 16, "%c%d", cmd, v); write(buf); };
+        
+        if(error) tx('e', idx);
+        else tx('w', idx);
+    }
 
-        if(error)
-            snprintf(buf, 16, "e%d", idx);
-        else
-            snprintf(buf, 16, "w%d", idx);
+    void send_ui_update(int battery_percentage, int current_average_meas_temp, int current_set_temp) {
+        auto tx = [&](char cmd, int v) {char buf[16]; snprintf(buf, 16, "%c%d", cmd, v); write(buf); };
 
-        write(buf);
+        tx('b', battery_percentage);
+        tx('c', current_average_meas_temp);
+        tx('d', current_set_temp);
     }
 
     void write(const char *data) {
@@ -104,6 +108,7 @@ public:
                 break;
             case 'u':
                 printf("UART_RX: UpdateLegSetTemp: %d\n", value);
+                current_set_temp = value;
                 break;
             case 'e':
                 printf("UART_RX: ErrorMsg: %d\n", value);
@@ -117,9 +122,12 @@ public:
             }
     }
 
+    int get_current_set_temp() const { return current_set_temp; }
+
     private:
         uart_inst_t *instance;
         int rx_buffer_idx = 0;
+        int current_set_temp = 20000;
 
         void setup_interrupts() {
             int irq_num = (instance == uart0) ? 0 : 1;
