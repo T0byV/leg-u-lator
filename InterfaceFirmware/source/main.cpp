@@ -8,13 +8,14 @@
 // Global is more fun
 const int max_tag_length = 8;
 const int max_value_length = 128;
-const int num_tags = 3;
+const int num_tags = 6;
 const char* tag_list[num_tags] = {
     "b",            // Current battery percentage
     "c",            // Currently measured temperature
     "d",            // Set temperature according to the controller
-    // "e",            // Error
-    // "w"             // Warning
+    "e",            // Error
+    "w",            // Warning
+    "n",            // Notice
     // "TIMSTA",       // Status of the timer (on/off)
     // "TIMREM",       // Remaining time of the timer
     // "POWSTA",       // Power status of the heating (on/off)
@@ -25,9 +26,9 @@ std::array<char[max_value_length], num_tags> value_list = { // Initialise to exa
     "100",
     "20.0",
     "25.0",
-    // "probleem? poar nem'",
-    // "pas uit! ",
-    // "1",
+    "",
+    "",
+    "Connected.",
     // "2h12m",
     // "1"
 };
