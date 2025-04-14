@@ -43,7 +43,7 @@ WIP!
 class SafetyControl {
     public:
         const char* ui_msg;         // String message sent to UI
-        bool severe_error;          // Flag for severe error, which should disable PWM + Cut heating activation line + Ring buzzer
+        bool severe_error = false;          // Flag for severe error, which should disable PWM + Cut heating activation line + Ring buzzer
         int cnt;                    // #, counter for tracking history
 
         // Checks for issues on startup, needs the status of the 2 I2C lines and the UART line as a boolean
