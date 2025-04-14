@@ -22,9 +22,6 @@ void core1_entry() {
 
 constexpr float DELTA_MILLIKELVIN_MILLICELSIUS = 273150.0;
 
-constexpr bool info = true;
-constexpr bool debug = true;
-
 int main() {
     stdio_init_all();
     sleep_ms(5000);

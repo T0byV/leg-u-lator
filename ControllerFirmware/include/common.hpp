@@ -7,3 +7,7 @@
 #include <cmath>
 
 #define ASSERT assert
+
+
+constexpr bool info = true;
+constexpr bool debug = false;

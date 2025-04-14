@@ -36,15 +36,77 @@ WIP!
 #pragma once
 
 #include <common.hpp>
+#include <hw/UART.hpp>
+#include <hw/PWM.hpp>
 
-#include <math.h>        // for using floor and stuff
+#include <cmath>        // for using floor and stuff
 #include <array>        // for using arrays
+
+constexpr const char* str[] = {
+    [0] = "No battery data connection",
+    [1] = "No sensor and/or heater data connection",
+    [2] = "No UI connection",
+    [3] = "Lost battery data connection",
+    [4] = "Lost sensor and/or heater data connection",
+    [5] = "Lost UI connection",
+    [6] = "No battery voltage data",
+    [7] = "Invalid battery voltage data",
+    [8] = "Sudden battery voltage difference",
+    [9] = "No battery current data",
+    [10] = "Invalid battery current data",
+    [11] = "Sudden battery current difference",
+    [12] = "Different power consumption than expected",
+    [13] = "Power leakage",
+    [14] = "Low battery",
+    [15] = "Battery empty",
+    [16] = "No temperature sensor data",
+    [17] = "Invalid temperature sensor data",
+    [18] = "Cold warning",
+    [19] = "Heat warning",
+    [20] = "Sudden temperature sensor difference",
+    [21] = "No heating current sensor data",
+    [22] = "Invalid heating current sensor data",
+    [23] = "(conversion is WIP!) Heating element current misaligns with sent PWM"
+};
+
+constexpr int msg_no_battery_data = 0;
+constexpr int msg_no_sensor_or_heater = 1;
+constexpr int msg_no_ui = 2;
+constexpr int msg_lost_battery_data = 3;
+constexpr int msg_lost_sensor_or_heater = 4;
+constexpr int msg_lost_ui = 5;
+constexpr int msg_no_battery_voltage_data = 6;
+constexpr int msg_invalid_battery_voltage_data = 7;
+constexpr int msg_sudden_battery_voltage_difference = 8;
+constexpr int msg_no_battery_current_data = 9;
+constexpr int msg_invalid_battery_current_data = 10;
+constexpr int msg_sudden_battery_current_difference = 11;
+constexpr int msg_different_power_consumption_than_expected = 12;
+constexpr int msg_power_leakage = 13;
+constexpr int msg_low_battery = 14;
+constexpr int msg_battery_empty = 15;
+
+constexpr int msg_no_temperature_sensor_data = 16;
+constexpr int msg_invalid_temperature_sensor_data = 17;
+constexpr int msg_cold_warning = 18;
+constexpr int msg_heat_warning = 19;
+
+constexpr int msg_sudden_temperature_sensor_difference = 20;
+constexpr int msg_no_heating_current_sensor_data = 21;
+constexpr int msg_invalid_heating_current_sensor_data = 22;
+
+constexpr int msg_misaligned_heating_current = 23;
+
+
 
 class SafetyControl {
     public:
-        const char* ui_msg;         // String message sent to UI
-        bool severe_error = false;          // Flag for severe error, which should disable PWM + Cut heating activation line + Ring buzzer
+        SafetyControl(UART* uart, PWM* buzzer_pwm, const std::array<PWM*, 4>& heating_pwms): uart{uart}, severe_error{false}, cnt{0}, buzzer_pwm{buzzer_pwm}, heating_pwms{heating_pwms} {}
+        UART* uart;
+        bool severe_error;          // Flag for severe error, which should disable PWM + Cut heating activation line + Ring buzzer
         int cnt;                    // #, counter for tracking history
+        PWM* buzzer_pwm;
+        std::array<PWM*, 4> heating_pwms;
 
         // Checks for issues on startup, needs the status of the 2 I2C lines and the UART line as a boolean
         void check_startup(bool i2c_status_power, bool i2c_status_sensorsheating, bool uart_status_ui){
@@ -52,16 +114,13 @@ class SafetyControl {
             
             // Startup/connection errors
             if (i2c_status_power == false) {
-                ui_msg = "No battery data connection";
-                severe_error = true;
+                alarm(msg_no_battery_data, true);
             }
             if (i2c_status_sensorsheating == false) {
-                ui_msg = "No sensor and/or heater data connection";
-                severe_error = true;
+                alarm(msg_no_sensor_or_heater, true);
             }
             if (uart_status_ui == false) {
-                ui_msg = "No UI connection";
-                severe_error = true;
+                alarm(msg_no_ui, true);
             }
         }
 
@@ -88,16 +147,13 @@ class SafetyControl {
 
             // CONNECTION ERRORS
             if (i2c_power == false) {
-                ui_msg = "Lost battery data connection";
-                severe_error = true;
+                alarm(msg_lost_battery_data, true);
             }
             if (i2c_sensorsheating == false) {
-                ui_msg = "Lost sensor and/or heater data connection";
-                severe_error = true;
+                alarm(msg_lost_sensor_or_heater, true);
             }
             if (uart_ui == false) {
-                ui_msg = "Lost UI connection";
-                severe_error = true;
+                alarm( msg_lost_ui, true);
             }
 
             // CHECKING BATTERY
@@ -109,19 +165,18 @@ class SafetyControl {
             for (int i = 0; i<tracking_size; i++) {     // go through every history array element of voltage
                 float value = track_power_voltage[i];
                 // Check absence of reading / connection / response time (NaN/inf)
-                if (isnan(value) || isinf(value)) {
-                    ui_msg = "No battery voltage data";
+                if (std::isnan(value) || std::isinf(value)) {
+                    alarm(msg_no_battery_voltage_data, false);
                 }
                 else {
                     // Sanity check values
                     if (value < 13600 || value > 16800) {
-                        ui_msg = "Invalid battery voltage data"; 
+                        alarm(msg_invalid_battery_voltage_data, false);
                     }
                     else if (i+1<tracking_size) {
                         // Check delta between readings (with next in history array, not for last element)
                         if (fabs(value-track_power_voltage[i+1]) > 1000) {
-                            ui_msg = "Sudden battery voltage difference";
-                            severe_error = true; 
+                            alarm(msg_sudden_battery_voltage_difference, true);
                         }
                     }   
                 }  
@@ -129,40 +184,37 @@ class SafetyControl {
             for (int i = 0; i<tracking_size; i++) {     // go through every history array element of current
                 float value = track_power_current[i];
                 // Check absence of reading / connection / response time (NaN/inf)
-                if (isnan(value) || isinf(value)) {
-                    ui_msg = "No battery current data";
+                if (std::isnan(value) || std::isinf(value)) {
+                    alarm(msg_no_battery_current_data, false);
                 }
                 else {
                     // Sanity check values
                     if (value < 0 || value > 8000) {
-                        ui_msg = "Invalid battery current data"; 
+                        alarm(msg_invalid_battery_current_data, false); 
                     }
                     else if (i+1<tracking_size) {
                         // Check delta between readings (with next in history array, not for last element)
                         if (fabs(value-track_power_current[i+1]) > 4000) {
-                            ui_msg = "Sudden battery current difference";
-                            severe_error = true; 
+                            alarm(msg_sudden_battery_current_difference, true);
                         }
                     }   
                 }  
             }
             // Compare battery output power with model heating power
             if (fabs(pwr_usage_now - (powerdata_current*powerdata_voltage/1000)) >= 5000) {   // difference in mW
-                ui_msg = "Different power consumption than expected";
+                alarm(msg_different_power_consumption_than_expected, false);
             }
             // Compare battery current with current sensors of heating
             float heating_current = currents[0]+currents[1]+currents[2]+currents[3];    // mA, total current measured by heating
             if (abs(powerdata_current - heating_current) >= 500) {      // difference in mA
-                ui_msg = "Power leakage";
-                severe_error = true;
+                alarm(msg_power_leakage, true);
             }
             // Low battery life
             if (bat_soc <= 25) {
-                ui_msg = "Low battery";
+                alarm(msg_low_battery, false);
             }
             if (bat_soc <= 10) {
-                ui_msg = "Battery empty";
-                severe_error = true;
+                alarm(msg_battery_empty, true);
             }
 
             // CHECKING SENSORS
@@ -175,25 +227,23 @@ class SafetyControl {
                         int32_t value = track_temps[i][c][s];
                         // Check absence of reading / connection / response time (NaN/inf)
                         if (value == INT16_MAX) {
-                            ui_msg = "No temperature sensor data";
+                            alarm(msg_no_temperature_sensor_data, false);
                         }
                         else {
                             // Sanity check values
                             if (value < 0 || value > 50) {
-                                ui_msg = "Invalid temperature sensor data"; 
+                                alarm(msg_invalid_temperature_sensor_data, false);
                             }
                             else if (value < 20) {
-                                ui_msg = "Cold warning"; 
+                                alarm(msg_cold_warning, false);
                             }
                             else if (value > 40) {
-                                ui_msg = "Heat warning"; 
-                                severe_error = true;
+                                alarm(msg_heat_warning, true);
                             }
                             else if (i+1<tracking_size) {
                                 // Check delta between readings (with next in history array, not for last element)
                                 if (fabs(value-track_temps[i+1][c][s]) > 2) {
-                                    ui_msg = "Sudden temperature sensor difference";
-                                    severe_error = true; 
+                                    alarm(msg_sudden_temperature_sensor_difference, true);
                                 }
                             }   
                         }  
@@ -210,21 +260,20 @@ class SafetyControl {
                 for (int i = 0; i<tracking_size; i++) {     // go through every history array element of sensors
                     float value = track_currents[i][s];
                     // Check absence of reading / connection / response time (NaN/inf)
-                    if (isnan(value) || isinf(value)) {
-                        ui_msg = "No heating current sensor data";
+                    if (std::isnan(value) || std::isinf(value)) {
+                        alarm(msg_no_heating_current_sensor_data, false);
                     }
                     else {
                         // Sanity check values
                         if (value < 0 || value > 2000) {
-                            ui_msg = "Invalid heating current sensor data"; 
+                            alarm(msg_invalid_heating_current_sensor_data, false);
                         } 
                     }  
                 }
                 // Compare current with sent PWM signals
                 float heating_pwm_current = 10 * pwm_heating[s];    // WIP! mA, converting PWM to A of a single PWM channel, magic?
                 if (fabs(track_currents[cnt][s]-heating_pwm_current) > 500) {
-                    ui_msg = "(conversion is WIP!) Heating element current misaligns with sent PWM";
-                    severe_error = true; 
+                    alarm(msg_misaligned_heating_current, true);
                 }
             }
 
@@ -234,11 +283,17 @@ class SafetyControl {
         }
 
         // Raises alarm when a severe error is processed, needs the boolean for severe error
-        void alarm(bool severe_error) {
+        void alarm(int msg_idx, bool severe_error) {
+            this->severe_error = severe_error;
+
             if (severe_error == true) {
-                // Disable PWM
-                // Cut heating activation line
-                // Ring buzzer
+                // Disable PWM, Cut heating activation line, Ring buzzer
+                for(auto* pwm : heating_pwms)
+                    pwm->set_duty_cycle_safe(0);
+
+                buzzer_pwm->set_duty_cycle_safe(50);
             }
+
+            uart->tx_error(msg_idx);
         }
 };

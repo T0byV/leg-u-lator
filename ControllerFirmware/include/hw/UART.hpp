@@ -34,6 +34,13 @@ public:
         uart_puts(instance, "UART bus initialised");
     }
 
+    void tx_error(int idx) {
+        char buf[16];
+        snprintf(buf, 16, "E%d", idx);
+
+        write(buf);
+    }
+
     void write(const char *data) {
         gpio_put(PICO_DEFAULT_LED_PIN, true);
         uart_puts(instance, data);
