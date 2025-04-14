@@ -78,7 +78,7 @@ class INA219 {
 
     private:
     void write_reg(uint8_t reg, uint16_t data) noexcept {
-        _bus->write<3>(_i2c_addr, {(uint8_t)reg, (data >> 8) & 0xFF, data & 0xFF}, true);
+        _bus->write<3>(_i2c_addr, {(uint8_t)reg, static_cast<uint8_t>((data >> 8) & 0xFF), static_cast<uint8_t>(data & 0xFF)}, true);
     }
 
     uint16_t read_reg(uint8_t reg) noexcept {

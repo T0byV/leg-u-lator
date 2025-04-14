@@ -16,14 +16,16 @@ class PWM {
 
             gpio_set_function(gpio_pin, GPIO_FUNC_PWM);
             uint slice_num = pwm_gpio_to_slice_num(gpio_pin);
-
+            if (debug) printf("pin: %d, slice: %d\n", gpio_pin, slice_num);
             pwm_set_clkdiv(slice_num, divider);
 
             pwm_set_wrap(slice_num, wrap_resolution);
 
             // Initialize to 0% duty cycle
             pwm_set_gpio_level(gpio_pin, current_set_duty_cycle);
+        }
 
+        void enable() {
             pwm_set_enabled(pwm_gpio_to_slice_num(gpio_pin), true);
         }
 
