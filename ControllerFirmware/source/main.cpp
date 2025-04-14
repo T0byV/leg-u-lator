@@ -11,6 +11,9 @@
 #include <control/PIDController.h>
 #include <control/WeightedTemperaturePoints.hpp>
 
+#include <functions/powerdata.hpp>
+#include <functions/safetycheck.hpp>
+
 // See: https://www.raspberrypi.com/documentation/pico-sdk/high_level.html#detailed-description-8 for core interaction
 void core1_entry() {
     while (1)
@@ -59,7 +62,21 @@ int main() {
         {&bus0, 0x41, 1, 0.1005}, // Channel 3
         {&bus0, 0x40, 1, 0.1006}  // Channel 4
     }};
+  
+    // Battery processing, to be moved somewhere
+    Battery bat;                                                    // Initialize battery data processing
+    //bat.startup(float powerdata_voltage);                           // Initialize battery data, needs some I2C magic measured voltage in mV
 
+    //bat.update_soc(float powerdata_voltage, float powerdata_current); // Every few seconds: Update battery SoC estimate, needs some I2C magic measured voltage [mV] and current [mA]
+    //bat.estimate_life(float pwr_usage_now);                         // Every few seconds: Update estimated battery hours left, needs estimated power usage from feedback model
+
+    // Safety controller, to be moved somewhere
+    SafetyControl safety;
+    //safety.check_startup(bool i2c_status_power, bool i2c_status_sensorsheating, bool uart_status_ui);         // Check startup connection errors, needs a status boolean of the two I2C lines and UART line
+    //safety.check_safety(bool i2c_power, float powerdata_current, float powerdata_voltage, bool i2c_sensorsheating, const std::array<std::array<int32_t, 2>, 6>& temps, const std::array<float, 4>& currents, float pwr_usage_now, const std::array<float, 4>& pwm_heating, int bat_soc, bool uart_ui);   // Every few seconds: Checks for safety concerns, uses basically all data available                                                                                 // Every few seconds: Check for safety concerns
+    //safety.alarm(bool severe_error);                                                                          // WIP: behaviour when the safety controller has raised the severe error flag
+    //cout << "UI message after safety check + severe flag: " << safety.ui_msg << " - " << safety.severe_error << "\n";         // debugging line
+  
     float max_duty_cycle = 0.2;
     std::array<PWM, number_of_heating_zones> heating_pwm_channels = {{
         {6, max_duty_cycle},
