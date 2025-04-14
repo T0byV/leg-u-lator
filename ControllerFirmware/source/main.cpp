@@ -128,10 +128,13 @@ int main() {
     };
     
     if (info) printf("First calibration\n");
-    for (int i = 0; i < number_of_heating_zones; i++)
-    {
-        if (info) printf("%.2fohm\t", heating_elements[i].calibrate_impedance());
+    if (csv_output) printf("FCAL: ");
+    for (int i = 0; i < number_of_heating_zones; i++){
+        float new_impedance = heating_elements[i].calibrate_impedance();
+        if (info) printf("%.2fohm\t", new_impedance);
+        if (csv_output) printf("%.2f,", new_impedance);
     }
+    if (csv_output) printf("\n");
     if (info) printf("\n\n");
 
     double setpoint_mc = 30000; // 30k mCº
@@ -151,18 +154,22 @@ int main() {
         //bat.estimate_life(float pwr_usage_now);                         // Every few seconds: Update estimated battery hours left, needs estimated power usage from feedback model
 
         if (calibration_cycle_counter >= calibration_after_cycles) {
-            printf("Calibrating\n");
+            if (info) printf("Calibrating\n");
+            // "CAL: imp1,imp2,imp3,imp4\n"
+            if (csv_output) printf("CAL: ");
             for (int i = 0; i < number_of_heating_zones; i++){
                 float new_impedance = heating_elements[i].calibrate_impedance();
                 if (info) printf("%.2fohm\t", new_impedance);
+                if (csv_output) printf("%.2f,", new_impedance);
             }
-            if (info) printf("\n");
+            if (info || csv_output) printf("\n");
             calibration_cycle_counter = 0;
         }
         calibration_cycle_counter++;
 
+        // "NORM: despow1,actpow1,zonetemp1,despow2,actpow2,zonetemp2,despow3,actpow3,zonetemp3,despow4,actpow4,zonetemp4\n"
+        if (csv_output) printf("NORM: ");
         std::array<float, number_of_heating_zones> zone_temperatures_data_mc = zone_temperatures.get_temperatures();
-
 
         //!!!!!!!UNCOMMENT WHEN UI IS DONE!!!!!!!!!!!!!
         /*setpoint_mc = uart_bus.get_current_set_temp();
@@ -191,10 +198,12 @@ int main() {
             desired_power_mw = 150;
             heating_elements[i].set_power_safe(desired_power_mw);
             sleep_ms(200);
-            if (info) printf("%.2fmW[desired:%.2fmW]\t", heating_elements[i].get_current_power(), desired_power_mw);
+            float actual_power = heating_elements[i].get_current_power();
+            if (csv_output) printf("%.3f,%.3f,%.3f,", desired_power_mw, actual_power, zone_temperatures_data_mc[i]);
+            if (info) printf("%.2fmW[desired:%.2fmW]\t", actual_power, desired_power_mw);
         }
-        printf("\n");
 
+        if (info || csv_output) printf("\n");
         sleep_ms(cycle_duration_ms);
     }
 }
