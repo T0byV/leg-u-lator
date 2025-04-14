@@ -4,6 +4,6 @@
 #include "pico/stdlib.h"
 #include "pico/binary_info.h"
 #include "pico/multicore.h"
-#include <cmath>
+#include "pico/cyw43_arch.h"
 
 #define ASSERT assert

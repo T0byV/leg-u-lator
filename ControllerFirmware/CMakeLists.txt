@@ -35,7 +35,7 @@ pico_sdk_init()
 
 # Add executable. Default name is the project name, version 0.1
 include_directories(include/)
-add_executable(ControllerFirmware source/main.cpp )
+add_executable(ControllerFirmware source/main.cpp source/control/PIDController.cpp)
 
 pico_set_program_name(ControllerFirmware "ControllerFirmware")
 pico_set_program_version(ControllerFirmware "0.1")
@@ -46,12 +46,14 @@ pico_enable_stdio_usb(ControllerFirmware 1)
 
 # Add the standard library to the build
 target_link_libraries(ControllerFirmware
-        pico_stdlib hardware_i2c pico_multicore)
+        pico_stdlib hardware_i2c pico_multicore hardware_pwm hardware_uart)
 
 # Add the standard include files to the build
 target_include_directories(ControllerFirmware PRIVATE
         ${CMAKE_CURRENT_LIST_DIR}
 )
+
+target_compile_options(ControllerFirmware PRIVATE -Wall -Wextra)
 
 pico_add_extra_outputs(ControllerFirmware)
 

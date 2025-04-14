@@ -2,7 +2,7 @@
 
 
 #include <common.hpp>
-#include <i2c/SyncI2CMaster.hpp>
+#include <hw/SyncI2CMaster.hpp>
 
 class INA219 {
     public:
@@ -58,13 +58,13 @@ class INA219 {
 
     // Returns shunt voltage in signed mV
     float read_shunt_voltage() noexcept {
-        return static_cast<float>(read_reg(reg_shunt_v)) / 100.0f;
+        return static_cast<float>(static_cast<int16_t>(read_reg(reg_shunt_v))) / 100.0f;
     }
 
     // Returns shunt current in mA
     float read_current() noexcept {
         write_reg(reg_calib, _cal_val);
-        return (static_cast<float>(read_reg(reg_current)) * current_lsb) * 1000.0f;
+        return (static_cast<float>(static_cast<int16_t>(read_reg(reg_current))) * current_lsb) * 1000.0f;
     }
 
     // Returns bus voltage in mV
