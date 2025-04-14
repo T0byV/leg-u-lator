@@ -291,6 +291,8 @@ class SafetyControl {
                 for(auto* pwm : heating_pwms)
                     pwm->set_duty_cycle_safe(0);
 
+                enable_heating_power(false); // Cutoff power to heating
+
                 buzzer_pwm->set_duty_cycle_safe(50);
             }
 

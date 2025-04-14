@@ -11,3 +11,5 @@
 constexpr bool csv_output = true;
 constexpr bool info = true && !csv_output;
 constexpr bool debug = false && !csv_output;
+
+void enable_heating_power(bool enable);
