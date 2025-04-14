@@ -23,7 +23,7 @@ void core1_entry() {
 constexpr float DELTA_MILLIKELVIN_MILLICELSIUS = 273150.0;
 
 constexpr bool info = true;
-constexpr bool debug = false;
+constexpr bool debug = true;
 
 int main() {
     stdio_init_all();
@@ -89,6 +89,16 @@ int main() {
         {8, max_duty_cycle},
         {9, max_duty_cycle}
     }};
+    for (int i = 0; i < 4; i++) {
+        heating_pwm_channels[i].enable();
+    }
+
+    if (debug) printf("Init PWM for buzzer.\n");
+    PWM buzzer = {22, 0.5};
+    buzzer.enable();
+    buzzer.set_duty_cycle_safe(0.5);
+    sleep_ms(1000);
+    buzzer.set_duty_cycle_safe(0.0);
 
     if (info) printf("Init heating zones (PWM + sensors).\n");
     float calibration_duty_cycle = 0.3;
@@ -126,10 +136,10 @@ int main() {
     int cycle_duration_ms = 1000;
     bool s = true;
 
-    if (info) printf("Starting main loop");
+    if (info) printf("Starting main loop\n");
     while (true)
     {
-        if (info) printf("New cycle");
+        if (info) printf("New cycle: ");
         gpio_put(PICO_DEFAULT_LED_PIN, s);
         s = !s;
 
@@ -140,7 +150,7 @@ int main() {
         if (calibration_cycle_counter >= calibration_after_cycles) {
             printf("Calibrating\n");
             for (int i = 0; i < number_of_heating_zones; i++){
-                float new_impedance = heating_elements[i].calibrate_impedance()
+                float new_impedance = heating_elements[i].calibrate_impedance();
                 if (info) printf("%.2fohm\t", new_impedance);
             }
             if (info) printf("\n");
