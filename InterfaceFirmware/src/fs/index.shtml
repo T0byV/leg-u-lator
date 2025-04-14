@@ -4,6 +4,7 @@
 <head>
     <title>Leg-u-lator</title>
     <link rel="stylesheet" href="style.css">
+    <meta http-equiv="refresh" content="4">
     <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
 </head>
 
@@ -22,19 +23,19 @@
     <div id="main">
         <h1>Leg-u-lator</h1>
         <div id="battery">
-            <p>Battery is at <span id="battery_percentage"></span>%</p>
-            <p>About <span id="remaining_time">1h12m</span> remaining.</p>
+            <p>Battery is at <span id="battery_percentage"><!--#b--></span>%</p>
+            <p>About <span id="remaining_time">rem bat tim</span> remaining.</p>
         </div>
         <br>
         <div id="temperatures">
             <div id="current_temperature">
                 <label>Measured temperature:</label>
-                <p class="temp" id="current_temperature">29.6</p>
+                <p class="temp" id="current_temperature"><!--#c--></p>
             </div>
             <div id="set_temperature">
                 <label>Set temperature:</label>
                 <div id="temp_setter">
-                    <p class="temp" id="set_temperature">30.0</p>
+                    <p class="temp" id="set_temperature"><!--#d--></p>
                     <div class="btns">
                         <button id="increase_temp">+0.5&nbsp;&deg;C</button>
                         <button id="decrease_temp">-0.5&nbsp;&deg;C</button>
@@ -50,13 +51,13 @@
         <div id="timer">
             <label>Timer:</label>
             <span id="timer_status">
-                active
+                Timer_status
             </span>
             <button id="timer_pause">
-                II
+                ▶️⏸️
             </button>
             <label>Remaining:</label>
-            <span id="timer_remaining">00:20</span>
+            <span id="timer_remaining">Remeaine tim</span>
             <div id="timer_settings">
                 <button>+</button>
                 <button>-</button>
@@ -66,6 +67,7 @@
         <div id="power_button">
             On 👍✅
             ❌
+            
         </div>
         <br>
     </div>
