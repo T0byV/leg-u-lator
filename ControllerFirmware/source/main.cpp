@@ -5,7 +5,7 @@
 #include <hw/UART.hpp>
 #include <drivers/fram.hpp>
 #include <drivers/current_sensor.hpp>
-//#include <drivers/fram.hpp>
+#include <drivers/fram.hpp>
 #include <drivers/temp_sensor.hpp>
 #include <drivers/heating_element.hpp>
 #include <control/PIDController.h>
@@ -65,7 +65,7 @@ int main() {
         {0.00, 0.43, 0.40, 0.00}
     }}};
 
-    if (info) printf("Init heating power sensors.\n");
+    if (debug) printf("Init heating power sensors.\n");
     std::array<INA219, number_of_heating_zones> heating_power_sensors = {{
         {&bus0, 0x45, 1, 0.101}, // Channel 1
         {&bus0, 0x44, 1, 0.1012}, // Channel 2
@@ -73,13 +73,15 @@ int main() {
         {&bus0, 0x40, 1, 0.1006}  // Channel 4
     }};
   
-    if (info) printf("Init heating power sensors.\n");
+    if (info) printf("Init battery voltage processing.\n");
     Battery bat;
     // bat.startup()
 
+    if (info) printf("Init safety controller.\n");
     SafetyControl safety;
+    // safety.check_startup(bool i2c_status_power, bool i2c_status_sensorsheating, bool uart_status_ui);
 
-
+    if (debug) printf("Init PWM channels heating zones.\n");
     float max_duty_cycle = 0.2;
     std::array<PWM, number_of_heating_zones> heating_pwm_channels = {{
         {6, max_duty_cycle},
@@ -88,6 +90,7 @@ int main() {
         {9, max_duty_cycle}
     }};
 
+    if (info) printf("Init heating zones (PWM + sensors).\n");
     float calibration_duty_cycle = 0.3;
     float max_power_mw_per_element = 2000;
     std::array<HeatingElement, number_of_heating_zones> heating_elements = {{
@@ -97,6 +100,7 @@ int main() {
         {3, &heating_pwm_channels[3], &heating_power_sensors[3], max_power_mw_per_element, calibration_duty_cycle}
     }};
     
+    if (info) printf("Init PID controller.\n");
     // PID parameters :
     double Kp = 5.0, Ki = 0.0005, Kd = 45.0; 
     double deadband = 0.5, baseline = 0.0, sampleTime = 1.0; 
@@ -109,37 +113,29 @@ int main() {
         PIDController(Kp, Ki, Kd, deadband, baseline, sampleTime, alphaTemp, alphaDeriv, maxPower)
     };
     
-    // bool s = false;
-
-    printf("First calibration\n");
+    if (info) printf("First calibration\n");
     for (int i = 0; i < number_of_heating_zones; i++)
     {
         printf("%.2fohm\t", heating_elements[i].calibrate_impedance());
     }
     printf("\n");
 
-
-    
     double setpoint_mc = 30000; // 30k mCº
-    // float desired_power_mw = 150;
     int calibration_cycle_counter = 0;
     int calibration_after_cycles = 10;
     int cycle_duration_ms = 1000;
-
     bool s = true;
+
+    if (info) printf("Starting main loop");
     while (true)
     {
+        if (info) printf("New cycle");
         gpio_put(PICO_DEFAULT_LED_PIN, s);
         s = !s;
-        sleep_ms(1000);
-    }
-    return 0;
-    while (true)
-    {
-        // gpio_put(PICO_DEFAULT_LED_PIN, s);
-        // s = !s;
-            //bat.update_soc(float powerdata_voltage, float powerdata_current); // Every few seconds: Update battery SoC estimate, needs some I2C magic measured voltage [mV] and current [mA]
-            //bat.estimate_life(float pwr_usage_now);                         // Every few seconds: Update estimated battery hours left, needs estimated power usage from feedback model
+        //bat.update_soc(float powerdata_voltage, float powerdata_current); // Every few seconds: Update battery SoC estimate, needs some I2C magic measured voltage [mV] and current [mA]
+        //bat.estimate_life(float pwr_usage_now);                         // Every few seconds: Update estimated battery hours left, needs estimated power usage from feedback model
+        
+        //safety.check_safety(bool i2c_power, float powerdata_current, float powerdata_voltage, bool i2c_sensorsheating, const std::array<std::array<int32_t, 2>, 6>& temps, const std::array<float, 4>& currents, float pwr_usage_now, const std::array<float, 4>& pwm_heating, int bat_soc, bool uart_ui);   // Every few seconds: Checks for safety concerns, uses basically all data available                                                                                 // Every few seconds: Check for safety concerns
         printf("Cycle start\n");
 
         if (calibration_cycle_counter >= calibration_after_cycles) {
@@ -167,22 +163,5 @@ int main() {
         printf("\n");
 
         sleep_ms(cycle_duration_ms);
-
-        // uart_bus.write("b47#");
-        // uart_bus.write("c25452#");
-        // uart_bus.write("d25000#");
-        // // uart_bus.write("u26000#");
-        // uart_bus.write("e3#");
-        // uart_bus.write("w5#");
-        // printf("%f %f %f %f %f\n", heating_power_sensors[0].read_bus_voltage(), heating_power_sensors[0].read_current(), heating_power_sensors[1].read_current(), heating_power_sensors[2].read_current(), heating_power_sensors[3].read_current());
-        //printf("%f %f %f %f\n", heating_power_sensors[0].read_bus_voltage(), heating_power_sensors[0].read_shunt_voltage(), heating_power_sensors[0].read_current(), (float)heating_power_sensors[0].read_shunt_voltage() / (float)heating_power_sensors[0].read_current());
-
-        // auto temps = sensing();
-
-        // printf("%d,%d,%d,%d,%d,%d,%d\n", time_us_32(), temps[0][0], temps[1][0], temps[2][0], temps[3][0], temps[4][0], temps[5][0]);
-        // printf("%d, %d, %d\n", time_us_32(), temps[0][0], temps[0][1]);
-
-        // printf("%d,%d\n", time_us_32(), temps[0]);
-
     }
 }
