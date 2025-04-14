@@ -103,10 +103,12 @@ int main() {
     PWM buzzer = {buzzer_gpio, 0.5};
     buzzer.enable();
     buzzer.set_duty_cycle_safe(0.5);
-    sleep_ms(400);
+    sleep_ms(100);
     buzzer.set_duty_cycle_safe(0.0);
-
-  
+    sleep_ms(100);
+    buzzer.set_duty_cycle_safe(0.5);
+    sleep_ms(100);
+    buzzer.set_duty_cycle_safe(0.0);
     if (info) printf("Init battery voltage processing.\n");
     Battery bat;
     // bat.startup()
