@@ -37,6 +37,10 @@
     "raspberry-pi-pico.cmakePath": "${HOME}/.pico-sdk/cmake/v3.31.5/bin/cmake",
     "raspberry-pi-pico.ninjaPath": "${HOME}/.pico-sdk/ninja/v1.12.1/ninja",
     "files.associations": {
+        "*.s": "platformio-debug.asm",
+        "*.css": "tailwindcss",
+        "*.j2": "yaml",
+        "*.html.erb": "erb",
         "stdlib.h": "c",
         "time.h": "c",
         "gpio.h": "c",
@@ -95,6 +99,25 @@
         "streambuf": "cpp",
         "text_encoding": "cpp",
         "thread": "cpp",
-        "variant": "cpp"
+        "variant": "cpp",
+        "__locale": "cpp",
+        "__bit_reference": "cpp",
+        "__hash_table": "cpp",
+        "__node_handle": "cpp",
+        "__split_buffer": "cpp",
+        "__tree": "cpp",
+        "__verbose_abort": "cpp",
+        "bitset": "cpp",
+        "complex": "cpp",
+        "cstring": "cpp",
+        "execution": "cpp",
+        "ios": "cpp",
+        "istream": "cpp",
+        "locale": "cpp",
+        "map": "cpp",
+        "print": "cpp",
+        "queue": "cpp",
+        "sstream": "cpp",
+        "stack": "cpp"
     }
 }
