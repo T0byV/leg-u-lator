@@ -228,7 +228,7 @@ int main() {
             sleep_ms(200);
             float actual_power = heating_elements[i].get_current_power();
             if (csv_output) printf("%.3f,%.3f,%.3f,", desired_power_mw, actual_power, zone_temperatures_data_mc[i]);
-            if (info) printf("%.0fmW[desired:%.0fmW][zone_temp:%.0f]\t", actual_power, desired_power_mw, zone_temperatures_data_mc[i]);
+            if (info) printf("[act:%.0fmW][des:%.0fmW][temp:%.2fCº]\t", actual_power, desired_power_mw, zone_temperatures_data_mc[i]*0.001);
         }
 
         if (info || csv_output) printf("\n");
