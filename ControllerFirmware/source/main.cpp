@@ -116,9 +116,9 @@ int main() {
     if (info) printf("First calibration\n");
     for (int i = 0; i < number_of_heating_zones; i++)
     {
-        printf("%.2fohm\t", heating_elements[i].calibrate_impedance());
+        if (info) printf("%.2fohm\t", heating_elements[i].calibrate_impedance());
     }
-    printf("\n");
+    if (info) printf("\n");
 
     double setpoint_mc = 30000; // 30k mCº
     int calibration_cycle_counter = 0;
@@ -132,18 +132,18 @@ int main() {
         if (info) printf("New cycle");
         gpio_put(PICO_DEFAULT_LED_PIN, s);
         s = !s;
+
         //bat.update_soc(float powerdata_voltage, float powerdata_current); // Every few seconds: Update battery SoC estimate, needs some I2C magic measured voltage [mV] and current [mA]
         //bat.estimate_life(float pwr_usage_now);                         // Every few seconds: Update estimated battery hours left, needs estimated power usage from feedback model
-        
         //safety.check_safety(bool i2c_power, float powerdata_current, float powerdata_voltage, bool i2c_sensorsheating, const std::array<std::array<int32_t, 2>, 6>& temps, const std::array<float, 4>& currents, float pwr_usage_now, const std::array<float, 4>& pwm_heating, int bat_soc, bool uart_ui);   // Every few seconds: Checks for safety concerns, uses basically all data available                                                                                 // Every few seconds: Check for safety concerns
-        printf("Cycle start\n");
 
         if (calibration_cycle_counter >= calibration_after_cycles) {
             printf("Calibrating\n");
             for (int i = 0; i < number_of_heating_zones; i++){
-                printf("%.2fohm\t", heating_elements[i].calibrate_impedance());
+                float new_impedance = heating_elements[i].calibrate_impedance()
+                if (info) printf("%.2fohm\t", new_impedance);
             }
-            printf("\n");
+            if (info) printf("\n");
             calibration_cycle_counter = 0;
         }
         calibration_cycle_counter++;
@@ -158,7 +158,7 @@ int main() {
             );
             heating_elements[i].set_power_safe(desired_power_mw);
             sleep_ms(200);
-            printf("%.2fmW\t", heating_elements[i].get_current_power());
+            if (info) printf("%.2fmW\t", heating_elements[i].get_current_power());
         }
         printf("\n");
 
