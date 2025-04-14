@@ -8,6 +8,6 @@
 
 #define ASSERT assert
 
-
-constexpr bool info = true;
-constexpr bool debug = false;
+constexpr bool csv_output = true;
+constexpr bool info = true && !csv_output;
+constexpr bool debug = false && !csv_output;
