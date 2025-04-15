@@ -60,7 +60,7 @@ public:
             }
             else if (ch == '#')
             {
-                rx_buffer[rx_buffer_idx] = '\0';
+                // rx_buffer[rx_buffer_idx] = '\0';
                 parse_buffer();
                 rx_buffer_idx = 0;
             }
@@ -74,6 +74,8 @@ public:
         char key = rx_buffer[0];
         char *p;
         int value = strtol(&rx_buffer[1], &p, 10);
+        printf("%c l\n", p);
+        printf("%c l\n", p);
 
         // b: battery percentage [%]
         // c: current average measured leg temperature [mC]
@@ -88,7 +90,9 @@ public:
                 break;
             case 'c':
                 printf("UART_RX: CurAvgMeasTemp: %d%\n", value);
-                strncpy(value_list[1], (char*) value, max_value_length);
+                printf("bier");
+                std::cout << (char *)value << std::endl;
+                // strncpy(value_list[1], (char *)value, max_value_length);
                 break;
             case 'd':
                 printf("UART_RX: CurSetTempControlMCU: %d%\n", value);
@@ -96,7 +100,7 @@ public:
                 break;
             case 'u':
                 printf("UART_RX: UpdateLegSetTemp: %d\n", value);
-                // strncpy(value_list[0], (char*) value, max_value_length);
+                strncpy(value_list[0], (char*) value, max_value_length);
                 break;
             case 'e':
                 printf("UART_RX: ErrorMsg: %d%\n", value);

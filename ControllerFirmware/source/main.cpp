@@ -248,6 +248,8 @@ int main() {
         }
 
         if (info || csv_output) printf("\n");
+
+        uart_bus.write("c31000#");
         sleep_ms(cycle_duration_ms);
     }
 }

@@ -85,7 +85,7 @@
 #define PPP_DEBUG                   LWIP_DBG_OFF
 #define SLIP_DEBUG                  LWIP_DBG_OFF
 #define DHCP_DEBUG                  LWIP_DBG_OFF
-#define HTTPD_DEBUG                 LWIP_DBG_ON
+#define HTTPD_DEBUG                 LWIP_DBG_OFF
 
 #define LWIP_HTTPD                  1
 #define LWIP_HTTPD_SSI              1
