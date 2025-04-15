@@ -38,13 +38,13 @@
                 <div id="temp_setter">
                     <p class="temp" id="set_temperature"><!--#d--></p>
                     <div class="btns">
-                        <button id="increase_temp">+0.5&nbsp;&deg;C</button>
-                        <button id="decrease_temp">-0.5&nbsp;&deg;C</button>
+                        <button id="increase_temp">+1.0&nbsp;&deg;C</button>
+                        <button id="decrease_temp">-1.0&nbsp;&deg;C</button>
                     </div>
                 </div>
                 <div id="limits">
-                    <label class="temp_limit">Min:</label><span class="temp"> 29.5</span>
-                    <label class="temp_limit">Max:</label><span class="temp"> 30.5</span>
+                    <label class="temp_limit">Min:</label><span class="temp"> 24.0</span>
+                    <label class="temp_limit">Max:</label><span class="temp"> 34.0</span>
                 </div>
             </div>
         </div>
