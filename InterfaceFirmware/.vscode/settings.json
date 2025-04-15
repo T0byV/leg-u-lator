@@ -37,10 +37,6 @@
     "raspberry-pi-pico.cmakePath": "${HOME}/.pico-sdk/cmake/v3.31.5/bin/cmake",
     "raspberry-pi-pico.ninjaPath": "${HOME}/.pico-sdk/ninja/v1.12.1/ninja",
     "files.associations": {
-        "*.s": "platformio-debug.asm",
-        "*.css": "tailwindcss",
-        "*.j2": "yaml",
-        "*.html.erb": "erb",
         "__bit_reference": "cpp",
         "__hash_table": "cpp",
         "__locale": "cpp",
