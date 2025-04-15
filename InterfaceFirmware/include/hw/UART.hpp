@@ -84,21 +84,27 @@ public:
         switch (key) {
             case 'b':
                 printf("UART_RX: BatPerc: %d%\n", value);
+                strncpy(value_list[0], (char*) value, max_value_length);
                 break;
             case 'c':
                 printf("UART_RX: CurAvgMeasTemp: %d%\n", value);
+                strncpy(value_list[1], (char*) value, max_value_length);
                 break;
             case 'd':
                 printf("UART_RX: CurSetTempControlMCU: %d%\n", value);
+                strncpy(value_list[2], (char*) value, max_value_length);
                 break;
             case 'u':
                 printf("UART_RX: UpdateLegSetTemp: %d\n", value);
+                // strncpy(value_list[0], (char*) value, max_value_length);
                 break;
             case 'e':
                 printf("UART_RX: ErrorMsg: %d%\n", value);
+                // strncpy(value_list[3], (char*) value, max_value_length);
                 break;
             case 'w':
                 printf("UART_RX: WarningMsg: %d%\n", value);
+                // strncpy(value_list[4], (char*) value, max_value_length);
                 break;
             default:
                 printf("ERR: UART_RX: Unknown: {%c - %d}\n", key, value);

@@ -1,0 +1,106 @@
+@charset "utf8";
+
+* {
+    box-sizing: border-box;
+    --color-bg: #f5dfce;
+    --color-error: #ee303c;
+    --color-warning: #ff9e5d;
+    --color-notice: #5e7785;
+    --color-text: #050609;
+}
+
+body {
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    font-family: "Source Sans Pro";
+}
+
+/* div {
+    border: 1px solid grey;
+    margin: 1px;
+} */
+
+div.banner {
+    padding: 4px;
+    margin: 5px 0;
+    border-radius: 10px;
+    font-size: x-large;
+}
+
+div.banner p {
+    margin: 0;
+}
+
+div.banner.notice {
+    background-color: var(--color-notice);
+    color: white;
+}
+
+div.banner.warning {
+    background-color: var(--color-warning);
+}
+
+div.banner.error {
+    background-color: var(--color-error);
+    border: 3px solid black
+}
+
+div#main {
+    background-color: pink;
+    margin-left: auto;
+    margin-right: auto;
+    width: max-content;
+    padding: 0 1em;
+}
+
+div.btns {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: space-evenly;
+    padding: 0 10px;
+}
+
+.btns button {
+    height: 60px;
+    width: 60px;
+    border: 2px solid black;
+    border-radius: 5px;
+}
+
+div#set_temperature {
+    display: flex;
+    flex-direction: column;
+}
+
+div#temp_setter {
+    display: flex;
+    align-items: center;
+}
+
+label.temp_limit {
+    text-decoration: underline;
+}
+
+p.temp {
+    font-size: 4rem;
+    margin-block: 0;
+}
+
+.temp::after {
+    content: "\00a0 °C";
+}
+
+#timer {
+    background-color: lightblue;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+#timer_settings {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+}
+

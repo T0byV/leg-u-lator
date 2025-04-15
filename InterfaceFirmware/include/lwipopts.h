@@ -51,10 +51,10 @@
 #define DHCP_DOES_ARP_CHECK         0
 #define LWIP_DHCP_DOES_ACD_CHECK    0
 
-#ifndef NDEBUG
-#define LWIP_DEBUG                  1
+#define LWIP_DEBUG
 #define LWIP_STATS                  1
 #define LWIP_STATS_DISPLAY          1
+#ifndef NDEBUG
 #endif
 
 #define ETHARP_DEBUG                LWIP_DBG_OFF
@@ -85,5 +85,12 @@
 #define PPP_DEBUG                   LWIP_DBG_OFF
 #define SLIP_DEBUG                  LWIP_DBG_OFF
 #define DHCP_DEBUG                  LWIP_DBG_OFF
+#define HTTPD_DEBUG                 LWIP_DBG_ON
+
+#define LWIP_HTTPD                  1
+#define LWIP_HTTPD_SSI              1
+#define LWIP_HTTPD_CGI              1
+
+#define HTTPD_FSDATA_FILE "../src/my_fsdata.c"
 
 #endif /* __LWIPOPTS_H__ */
