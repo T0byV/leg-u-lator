@@ -1,0 +1,89 @@
+Measurement where it went kaduk
+---- Opened the serial port /dev/tty.usbmodem1301 ----
+Controller startup.
+Init temperature sensors.
+Init battery voltage processing.
+Init safety controller.
+Init heating zones (PWM + sensors).
+Init PID controller.
+First calibration
+7.71ohm 5.76ohm 5.74ohm 4.28ohm
+
+Starting main loop
+New cycle: [act:6.66W][des:7.00W][temp:23.23Cº] [act:8.61W][des:11.00W][temp:22.66Cº]   [act:16.15W][des:20.00W][temp:23.07Cº]  [act:8.66W][des:13.00W][temp:22.67Cº]
+New cycle: [act:6.07W][des:7.00W][temp:23.22Cº] [act:8.05W][des:11.00W][temp:22.66Cº]   [act:15.64W][des:20.00W][temp:23.05Cº]  [act:8.68W][des:13.00W][temp:22.65Cº]
+New cycle: [act:6.08W][des:7.00W][temp:23.23Cº] [act:8.05W][des:11.00W][temp:22.67Cº]   [act:15.65W][des:20.00W][temp:23.06Cº]  [act:8.69W][des:13.00W][temp:22.65Cº]
+New cycle: [act:6.08W][des:7.00W][temp:23.23Cº] [act:8.06W][des:11.00W][temp:22.67Cº]   [act:15.66W][des:20.00W][temp:23.07Cº]  [act:8.69W][des:13.00W][temp:22.68Cº]
+New cycle: [act:6.08W][des:7.00W][temp:23.23Cº] [act:8.06W][des:11.00W][temp:22.66Cº]   [act:15.67W][des:20.00W][temp:23.06Cº]  [act:8.69W][des:13.00W][temp:22.64Cº]
+New cycle: [act:6.09W][des:7.00W][temp:23.23Cº] [act:8.06W][des:11.00W][temp:22.67Cº]   [act:15.67W][des:20.00W][temp:23.06Cº]  [act:8.70W][des:13.00W][temp:22.67Cº]
+New cycle: [act:6.09W][des:7.00W][temp:23.22Cº] [act:8.07W][des:11.00W][temp:22.66Cº]   [act:15.67W][des:20.00W][temp:23.05Cº]  [act:8.70W][des:13.00W][temp:22.65Cº]
+New cycle: [act:6.09W][des:7.00W][temp:23.22Cº] [act:8.07W][des:11.00W][temp:22.66Cº]   [act:15.68W][des:20.00W][temp:23.06Cº]  [act:8.70W][des:13.00W][temp:22.67Cº]
+New cycle: [act:6.09W][des:7.00W][temp:23.23Cº] [act:8.07W][des:11.00W][temp:22.66Cº]   [act:15.68W][des:20.00W][temp:23.06Cº]  [act:8.70W][des:13.00W][temp:22.65Cº]
+New cycle: [act:6.09W][des:7.00W][temp:23.22Cº] [act:8.07W][des:11.00W][temp:22.67Cº]   [act:15.68W][des:20.00W][temp:23.05Cº]  [act:8.70W][des:13.00W][temp:22.68Cº]
+New cycle: Calibrating: 8.29ohm 6.14ohm 6.16ohm 4.30ohm
+continuing: [act:5.67W][des:7.00W][temp:23.23Cº]        [act:7.56W][des:11.00W][temp:22.68Cº]   [act:14.61W][des:20.00W][temp:23.07Cº]  [act:8.64W][des:13.00W][temp:22.68Cº]
+New cycle: [act:5.67W][des:7.00W][temp:23.23Cº] [act:7.57W][des:11.00W][temp:22.69Cº]   [act:14.61W][des:20.00W][temp:23.07Cº]  [act:8.64W][des:13.00W][temp:22.77Cº]
+New cycle: [act:5.67W][des:7.00W][temp:23.25Cº] [act:7.57W][des:11.00W][temp:22.69Cº]   [act:14.62W][des:20.00W][temp:23.07Cº]  [act:8.65W][des:13.00W][temp:22.77Cº]
+New cycle: [act:5.67W][des:7.00W][temp:23.25Cº] [act:7.57W][des:11.00W][temp:22.69Cº]   [act:14.62W][des:20.00W][temp:23.08Cº]  [act:8.64W][des:13.00W][temp:22.80Cº]
+New cycle: [act:5.67W][des:7.00W][temp:23.25Cº] [act:7.57W][des:11.00W][temp:22.70Cº]   [act:14.62W][des:20.00W][temp:23.08Cº]  [act:8.64W][des:13.00W][temp:22.80Cº]
+New cycle: [act:5.67W][des:7.00W][temp:23.26Cº] [act:7.57W][des:11.00W][temp:22.72Cº]   [act:14.62W][des:20.00W][temp:23.11Cº]  [act:8.65W][des:13.00W][temp:22.80Cº]
+New cycle: [act:5.67W][des:7.00W][temp:23.28Cº] [act:7.57W][des:11.00W][temp:22.70Cº]   [act:14.62W][des:20.00W][temp:23.10Cº]  [act:8.65W][des:13.00W][temp:22.80Cº]
+New cycle: [act:5.67W][des:7.00W][temp:23.29Cº] [act:7.57W][des:11.00W][temp:22.71Cº]   [act:14.62W][des:20.00W][temp:23.10Cº]  [act:8.65W][des:13.00W][temp:22.80Cº]
+New cycle: [act:5.67W][des:7.00W][temp:23.32Cº] [act:7.57W][des:11.00W][temp:22.74Cº]   [act:14.62W][des:20.00W][temp:23.16Cº]  [act:8.65W][des:13.00W][temp:22.82Cº]
+New cycle: [act:5.67W][des:7.00W][temp:23.32Cº] [act:7.57W][des:11.00W][temp:22.76Cº]   [act:14.62W][des:20.00W][temp:23.17Cº]  [act:8.65W][des:13.00W][temp:22.82Cº]
+New cycle: Calibrating: 8.35ohm 6.16ohm 6.19ohm 4.33ohm
+continuing: [act:5.63W][des:7.00W][temp:23.35Cº]        [act:7.54W][des:11.00W][temp:22.77Cº]   [act:14.54W][des:20.00W][temp:23.17Cº]  [act:8.60W][des:13.00W][temp:22.82Cº]
+New cycle: [act:5.63W][des:7.00W][temp:23.41Cº] [act:7.55W][des:11.00W][temp:22.81Cº]   [act:14.55W][des:20.00W][temp:23.22Cº]  [act:8.60W][des:13.00W][temp:22.87Cº]
+New cycle: [act:5.63W][des:7.00W][temp:23.39Cº] [act:7.55W][des:11.00W][temp:22.81Cº]   [act:14.55W][des:20.00W][temp:23.21Cº]  [act:8.60W][des:13.00W][temp:22.87Cº]
+New cycle: [act:5.63W][des:7.00W][temp:23.42Cº] [act:7.55W][des:11.00W][temp:22.84Cº]   [act:14.55W][des:20.00W][temp:23.24Cº]  [act:8.60W][des:13.00W][temp:22.87Cº]
+New cycle: [act:5.63W][des:7.00W][temp:23.42Cº] [act:7.55W][des:11.00W][temp:22.85Cº]   [act:14.55W][des:20.00W][temp:23.25Cº]  [act:8.60W][des:13.00W][temp:22.90Cº]
+New cycle: [act:5.63W][des:7.00W][temp:23.48Cº] [act:7.55W][des:11.00W][temp:22.85Cº]   [act:14.55W][des:20.00W][temp:23.26Cº]  [act:8.60W][des:13.00W][temp:22.91Cº]
+New cycle: [act:5.63W][des:7.00W][temp:23.48Cº] [act:7.54W][des:11.00W][temp:22.88Cº]   [act:14.55W][des:20.00W][temp:23.27Cº]  [act:8.60W][des:13.00W][temp:22.91Cº]
+New cycle: [act:5.63W][des:7.00W][temp:23.45Cº] [act:7.54W][des:11.00W][temp:22.89Cº]   [act:14.55W][des:20.00W][temp:23.29Cº]  [act:8.60W][des:13.00W][temp:22.94Cº]
+New cycle: [act:5.63W][des:7.00W][temp:23.51Cº] [act:7.55W][des:11.00W][temp:22.91Cº]   [act:14.54W][des:20.00W][temp:23.28Cº]  [act:8.60W][des:13.00W][temp:22.92Cº]
+New cycle: [act:5.63W][des:7.00W][temp:23.54Cº] [act:7.55W][des:11.00W][temp:22.93Cº]   [act:14.54W][des:20.00W][temp:23.31Cº]  [act:8.60W][des:13.00W][temp:22.95Cº]
+New cycle: Calibrating: 8.35ohm 6.16ohm 6.18ohm 4.32ohm
+continuing: [act:5.63W][des:7.00W][temp:23.52Cº]        [act:7.54W][des:11.00W][temp:22.93Cº]   [act:14.58W][des:20.00W][temp:23.32Cº]  [act:8.60W][des:13.00W][temp:22.95Cº]
+New cycle: [act:5.63W][des:7.00W][temp:23.64Cº] [act:7.54W][des:11.00W][temp:23.01Cº]   [act:14.58W][des:20.00W][temp:23.38Cº]  [act:8.60W][des:13.00W][temp:23.02Cº]
+New cycle: [act:5.63W][des:7.00W][temp:23.64Cº] [act:7.54W][des:11.00W][temp:23.02Cº]   [act:14.58W][des:20.00W][temp:23.39Cº]  [act:8.60W][des:13.00W][temp:23.02Cº]
+New cycle: [act:5.63W][des:7.00W][temp:23.67Cº] [act:7.54W][des:11.00W][temp:23.04Cº]   [act:14.58W][des:20.00W][temp:23.42Cº]  [act:8.60W][des:13.00W][temp:23.02Cº]
+New cycle: [act:5.63W][des:7.00W][temp:23.67Cº] [act:7.54W][des:11.00W][temp:23.07Cº]   [act:14.58W][des:20.00W][temp:23.42Cº]  [act:8.60W][des:13.00W][temp:23.05Cº]
+09:24:50:849 -> New cycle: [act:5.63W][des:7.00W][temp:23.73Cº] [act:7.54W][des:11.00W][temp:23.10Cº]   [act:14.57W][des:20.00W][temp:23.46Cº]  [act:8.60W][des:13.00W][temp:23.07Cº]
+09:24:52:772 -> New cycle: [act:5.63W][des:7.00W][temp:23.76Cº] [act:7.54W][des:11.00W][temp:23.09Cº]   [act:14.57W][des:20.00W][temp:23.47Cº]  [act:8.60W][des:13.00W][temp:23.08Cº]
+09:24:54:695 -> New cycle: [act:5.63W][des:7.00W][temp:23.77Cº] [act:7.54W][des:11.00W][temp:23.13Cº]   [act:14.57W][des:20.00W][temp:23.51Cº]  [act:8.60W][des:13.00W][temp:23.10Cº]
+09:24:56:618 -> New cycle: [act:5.63W][des:7.00W][temp:23.80Cº] [act:7.54W][des:11.00W][temp:23.15Cº]   [act:14.57W][des:20.00W][temp:23.51Cº]  [act:8.60W][des:13.00W][temp:23.12Cº]
+09:24:58:542 -> New cycle: [act:5.63W][des:7.00W][temp:23.83Cº] [act:7.54W][des:11.00W][temp:23.19Cº]   [act:14.57W][des:20.00W][temp:23.56Cº]  [act:8.60W][des:13.00W][temp:23.13Cº]
+09:25:00:464 -> New cycle: Calibrating: 8.34ohm 6.15ohm 6.16ohm 4.32ohm
+09:25:04:183 -> continuing: [act:5.63W][des:7.00W][temp:23.89Cº]        [act:7.55W][des:11.00W][temp:23.19Cº]   [act:14.61W][des:20.00W][temp:23.56Cº]  [act:8.60W][des:13.00W][temp:23.15Cº]
+09:25:06:006 -> New cycle: [act:5.63W][des:7.00W][temp:23.93Cº] [act:7.55W][des:11.00W][temp:23.27Cº]   [act:14.62W][des:20.00W][temp:23.63Cº]  [act:8.60W][des:13.00W][temp:23.20Cº]
+09:25:07:929 -> New cycle: [act:5.63W][des:7.00W][temp:23.98Cº] [act:7.55W][des:11.00W][temp:23.28Cº]   [act:14.62W][des:20.00W][temp:23.66Cº]  [act:8.61W][des:13.00W][temp:23.22Cº]
+09:25:09:852 -> New cycle: [act:5.63W][des:7.00W][temp:23.99Cº] [act:7.55W][des:11.00W][temp:23.31Cº]   [act:14.62W][des:20.00W][temp:23.68Cº]  [act:8.61W][des:13.00W][temp:23.22Cº]
+09:25:11:775 -> New cycle: [act:5.63W][des:7.00W][temp:24.05Cº] [act:7.55W][des:11.00W][temp:23.33Cº]   [act:14.62W][des:20.00W][temp:23.69Cº]  [act:8.60W][des:13.00W][temp:23.23Cº]
+09:25:13:698 -> New cycle: [act:5.63W][des:7.00W][temp:24.08Cº] [act:7.55W][des:11.00W][temp:23.34Cº]   [act:14.61W][des:20.00W][temp:23.72Cº]  [act:8.60W][des:13.00W][temp:23.23Cº]
+09:25:15:621 -> New cycle: [act:5.63W][des:7.00W][temp:24.05Cº] [act:7.55W][des:11.00W][temp:23.38Cº]   [act:14.61W][des:20.00W][temp:23.77Cº]  [act:8.60W][des:13.00W][temp:23.27Cº]
+09:25:17:545 -> New cycle: [act:5.63W][des:7.00W][temp:24.11Cº] [act:7.55W][des:11.00W][temp:23.40Cº]   [act:14.61W][des:20.00W][temp:23.78Cº]  [act:8.60W][des:13.00W][temp:23.28Cº]
+09:25:19:468 -> New cycle: [act:5.63W][des:7.00W][temp:24.17Cº] [act:7.55W][des:11.00W][temp:23.40Cº]   [act:14.61W][des:20.00W][temp:23.80Cº]  [act:8.60W][des:13.00W][temp:23.28Cº]
+09:25:21:391 -> New cycle: [act:5.62W][des:7.00W][temp:24.18Cº] [act:7.55W][des:11.00W][temp:23.44Cº]   [act:14.61W][des:20.00W][temp:23.81Cº]  [act:8.60W][des:13.00W][temp:23.30Cº]
+09:25:23:314 -> New cycle: Calibrating: 8.33ohm 6.13ohm 6.14ohm 4.31ohm
+09:25:27:032 -> continuing: [act:5.64W][des:7.00W][temp:24.23Cº]        [act:7.56W][des:11.00W][temp:23.46Cº]   [act:14.65W][des:20.00W][temp:23.84Cº]  [act:8.61W][des:13.00W][temp:23.30Cº]
+09:25:28:855 -> New cycle: [act:5.64W][des:7.00W][temp:24.30Cº] [act:7.56W][des:11.00W][temp:23.52Cº]   [act:14.65W][des:20.00W][temp:23.91Cº]  [act:8.61W][des:13.00W][temp:23.36Cº]
+09:25:30:778 -> New cycle: [act:5.64W][des:7.00W][temp:24.30Cº] [act:7.56W][des:11.00W][temp:23.54Cº]   [act:14.65W][des:20.00W][temp:23.94Cº]  [act:8.61W][des:13.00W][temp:23.38Cº]
+09:25:32:701 -> New cycle: [act:5.64W][des:7.00W][temp:24.33Cº] [act:7.56W][des:11.00W][temp:23.58Cº]   [act:14.65W][des:20.00W][temp:23.95Cº]  [act:8.61W][des:13.00W][temp:23.40Cº]
+09:25:34:624 -> New cycle: [act:5.64W][des:7.00W][temp:24.34Cº] [act:7.57W][des:11.00W][temp:23.59Cº]   [act:14.66W][des:20.00W][temp:24.00Cº]  [act:8.63W][des:13.00W][temp:23.42Cº]
+09:25:36:548 -> New cycle: [act:5.81W][des:7.00W][temp:24.40Cº] [act:7.81W][des:11.00W][temp:23.61Cº]   [act:15.14W][des:20.00W][temp:24.00Cº]  [act:9.21W][des:13.00W][temp:23.42Cº]
+09:25:38:471 -> New cycle: [act:5.81W][des:7.00W][temp:24.40Cº] [act:7.81W][des:11.00W][temp:23.66Cº]   [act:15.14W][des:20.00W][temp:24.06Cº]  [act:9.21W][des:13.00W][temp:23.46Cº]
+09:25:40:394 -> New cycle: [act:5.81W][des:7.00W][temp:24.43Cº] [act:7.81W][des:11.00W][temp:23.65Cº]   [act:15.14W][des:20.00W][temp:24.07Cº]  [act:9.21W][des:13.00W][temp:23.47Cº]
+09:25:42:317 -> New cycle: [act:5.81W][des:7.00W][temp:24.49Cº] [act:7.81W][des:11.00W][temp:23.70Cº]   [act:15.14W][des:20.00W][temp:24.11Cº]  [act:9.21W][des:13.00W][temp:23.48Cº]
+09:25:44:240 -> New cycle: [act:5.81W][des:7.00W][temp:24.52Cº] [act:7.81W][des:11.00W][temp:23.72Cº]   [act:15.14W][des:20.00W][temp:24.12Cº]  [act:9.21W][des:13.00W][temp:23.48Cº]
+09:25:46:163 -> New cycle: Calibrating: 8.23ohm 6.04ohm 6.03ohm 3826.21ohm
+09:25:49:881 -> continuing: [act:5.88W][des:7.00W][temp:24.52Cº]        [act:7.93W][des:11.00W][temp:23.74Cº]   [act:15.41W][des:20.00W][temp:24.14Cº]  [act:0.01W][des:13.00W][temp:23.50Cº]
+09:25:51:705 -> New cycle: [act:5.88W][des:7.00W][temp:24.62Cº] [act:7.93W][des:11.00W][temp:23.80Cº]   [act:15.41W][des:20.00W][temp:24.20Cº]  [act:0.01W][des:13.00W][temp:23.55Cº]
+09:25:53:628 -> New cycle: [act:5.88W][des:7.00W][temp:24.62Cº] [act:7.93W][des:11.00W][temp:23.82Cº]   [act:15.42W][des:20.00W][temp:24.22Cº]  [act:0.01W][des:13.00W][temp:23.56Cº]
+09:25:55:551 -> New cycle: [act:5.88W][des:7.00W][temp:24.68Cº] [act:7.93W][des:11.00W][temp:23.87Cº]   [act:15.42W][des:20.00W][temp:24.25Cº]  [act:0.01W][des:13.00W][temp:23.56Cº]
+09:25:57:474 -> New cycle: [act:5.88W][des:7.00W][temp:24.71Cº] [act:7.93W][des:11.00W][temp:23.86Cº]   [act:15.41W][des:20.00W][temp:24.28Cº]  [act:0.01W][des:13.00W][temp:23.58Cº]
+09:25:59:397 -> New cycle: [act:5.88W][des:7.00W][temp:24.75Cº] [act:7.93W][des:11.00W][temp:23.91Cº]   [act:15.41W][des:20.00W][temp:24.30Cº]  [act:0.01W][des:13.00W][temp:23.60Cº]
+09:26:01:320 -> New cycle: [act:5.88W][des:7.00W][temp:24.75Cº] [act:7.93W][des:11.00W][temp:23.90Cº]   [act:15.41W][des:20.00W][temp:24.32Cº]  [act:0.01W][des:13.00W][temp:23.60Cº]
+09:26:03:243 -> New cycle: [act:5.88W][des:7.00W][temp:24.81Cº] [act:7.93W][des:11.00W][temp:23.94Cº]   [act:15.41W][des:20.00W][temp:24.34Cº]  [act:0.01W][des:13.00W][temp:23.61Cº]
+09:26:05:166 -> New cycle: [act:5.88W][des:7.00W][temp:24.81Cº] [act:7.93W][des:11.00W][temp:23.96Cº]   [act:15.41W][des:20.00W][temp:24.36Cº]  [act:0.01W][des:13.00W][temp:23.65Cº]
+09:26:07:089 -> New cycle: [act:5.88W][des:7.00W][temp:24.87Cº] [act:7.93W][des:11.00W][temp:23.96Cº]   [act:15.41W][des:20.00W][temp:24.39Cº]  [act:0.01W][des:13.00W][temp:23.65Cº]
+09:26:09:012 -> New cycle: Calibrating: 8.22ohm 6.02ohm 6.01ohm 4173.25ohm
