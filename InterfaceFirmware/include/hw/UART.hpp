@@ -7,13 +7,14 @@
 #include <vector>
 #include <cctype>
 #include <cstdlib>
+#include <string>
 
 extern class UART* irq_userptrs[2];
 
 void on_uart0_irq();
 void on_uart1_irq();
 
-constexpr std::size_t RX_BUFFER_LEN = 32;
+constexpr uint8_t RX_BUFFER_LEN = 32;
 class UART
 {
 public:
@@ -60,7 +61,7 @@ public:
             }
             else if (ch == '#')
             {
-                // rx_buffer[rx_buffer_idx] = '\0';
+                rx_buffer[rx_buffer_idx] = '\0';
                 parse_buffer();
                 rx_buffer_idx = 0;
             }
@@ -74,8 +75,6 @@ public:
         char key = rx_buffer[0];
         char *p;
         int value = strtol(&rx_buffer[1], &p, 10);
-        printf("%c l\n", p);
-        printf("%c l\n", p);
 
         // b: battery percentage [%]
         // c: current average measured leg temperature [mC]
@@ -85,29 +84,30 @@ public:
         // w: warning
         switch (key) {
             case 'b':
-                printf("UART_RX: BatPerc: %d%\n", value);
-                strncpy(value_list[0], (char*) value, max_value_length);
+                printf("UART_RX: BatPerc: %d%%\n", value);
+                strncpy(value_list[0], std::to_string(value).c_str(), max_value_length - 1);
                 break;
             case 'c':
-                printf("UART_RX: CurAvgMeasTemp: %d%\n", value);
-                printf("bier");
-                std::cout << (char *)value << std::endl;
-                // strncpy(value_list[1], (char *)value, max_value_length);
+                printf("UART_RX: CurAvgMeasTemp: %d\n", value);
+                strncpy(value_list[1], std::to_string(value).c_str(), max_value_length - 1);
+                printf("uart: %s\n", value_list[1]);
                 break;
             case 'd':
-                printf("UART_RX: CurSetTempControlMCU: %d%\n", value);
-                strncpy(value_list[2], (char*) value, max_value_length);
+                printf("UART_RX: CurSetTempControlMCU: %d\n", value);
+                strncpy(value_list[2], std::to_string(value).c_str(), max_value_length - 1);
+                printf("uart: %s\n", value_list[2]);
+
                 break;
             case 'u':
                 printf("UART_RX: UpdateLegSetTemp: %d\n", value);
-                strncpy(value_list[0], (char*) value, max_value_length);
+                strncpy(value_list[0], std::to_string(value).c_str(), max_value_length - 1);
                 break;
             case 'e':
-                printf("UART_RX: ErrorMsg: %d%\n", value);
+                printf("UART_RX: ErrorMsg: %d\n", value);
                 // strncpy(value_list[3], (char*) value, max_value_length);
                 break;
             case 'w':
-                printf("UART_RX: WarningMsg: %d%\n", value);
+                printf("UART_RX: WarningMsg: %d\n", value);
                 // strncpy(value_list[4], (char*) value, max_value_length);
                 break;
             default:
@@ -118,7 +118,7 @@ public:
 
     private:
         uart_inst_t *instance;
-        int rx_buffer_idx = 0;
+        uint8_t rx_buffer_idx = 0;
 
         void setup_interrupts() {
             int irq_num = (instance == uart0) ? 0 : 1;

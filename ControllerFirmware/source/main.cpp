@@ -249,7 +249,8 @@ int main() {
 
         if (info || csv_output) printf("\n");
 
-        uart_bus.write("c31000#");
+        uart_bus.write("c3123#");
+        uart_bus.write("d3000167#");
         sleep_ms(cycle_duration_ms);
     }
 }
