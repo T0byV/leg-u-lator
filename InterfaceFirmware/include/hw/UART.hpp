@@ -42,6 +42,7 @@ public:
     }
 
     void on_uart_rx() {
+        bool s = save_and_disable_interrupts();
         while (uart_is_readable(instance))
         {
             char ch = uart_getc(instance);
@@ -69,6 +70,7 @@ public:
                 rx_buffer_idx = 0;
             }
         }
+        restore_interrupts_from_disabled(s);
     }
 
     void parse_buffer() {
@@ -90,13 +92,10 @@ public:
             case 'c':
                 printf("UART_RX: CurAvgMeasTemp: %d\n", value);
                 strncpy(value_list[1], std::to_string(value).c_str(), max_value_length - 1);
-                printf("uart: %s\n", value_list[1]);
                 break;
             case 'd':
                 printf("UART_RX: CurSetTempControlMCU: %d\n", value);
                 strncpy(value_list[2], std::to_string(value).c_str(), max_value_length - 1);
-                printf("uart: %s\n", value_list[2]);
-
                 break;
             case 'u':
                 printf("UART_RX: UpdateLegSetTemp: %d\n", value);
