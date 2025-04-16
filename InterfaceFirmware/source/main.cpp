@@ -57,7 +57,7 @@ bool connect_to_wifi() {
 
 u16_t handle_tags(int iIndex, char *pcInsert, int iInsertLen){
     strncpy(pcInsert, value_list[iIndex], max_value_length - 1);
-    printf("%s\n", value_list[2]);
+    if (info) printf("%s\n", value_list[2]);
     return strlen(value_list[iIndex]);
 }
 
