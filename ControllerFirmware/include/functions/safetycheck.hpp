@@ -266,7 +266,7 @@ class SafetyControl {
                     else {
                         // Sanity check values
                         float bound = 0.0;      //mA, boundary for each heating zone based on testing
-                        switch s {
+                        switch (s) {
                             case 0:
                                 bound = 2800;
                                 break;
