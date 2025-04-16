@@ -175,7 +175,7 @@ class SafetyControl {
                     }
                     else if (i+1<tracking_size) {
                         // Check delta between readings (with next in history array, not for last element)
-                        if (fabs(value-track_power_voltage[i+1]) > 1000) {
+                        if (fabs(value-track_power_voltage[i+1]) > 300) {
                             alarm(msg_sudden_battery_voltage_difference, true);
                         }
                     }   
@@ -189,24 +189,24 @@ class SafetyControl {
                 }
                 else {
                     // Sanity check values
-                    if (value < 0 || value > 8000) {
+                    if (value < 0 || value > 4000) {
                         alarm(msg_invalid_battery_current_data, false); 
                     }
                     else if (i+1<tracking_size) {
                         // Check delta between readings (with next in history array, not for last element)
-                        if (fabs(value-track_power_current[i+1]) > 4000) {
+                        if (fabs(value-track_power_current[i+1]) > 1000) {
                             alarm(msg_sudden_battery_current_difference, true);
                         }
                     }   
                 }  
             }
             // Compare battery output power with model heating power
-            if (fabs(pwr_usage_now - (powerdata_current*powerdata_voltage/1000)) >= 5000) {   // difference in mW
+            if (fabs(pwr_usage_now - (powerdata_current*powerdata_voltage/1000)) >= 3000) {   // difference in mW
                 alarm(msg_different_power_consumption_than_expected, false);
             }
             // Compare battery current with current sensors of heating
             float heating_current = currents[0]+currents[1]+currents[2]+currents[3];    // mA, total current measured by heating
-            if (abs(powerdata_current - heating_current) >= 500) {      // difference in mA
+            if (abs(powerdata_current - heating_current) >= 300) {      // difference in mA
                 alarm(msg_power_leakage, true);
             }
             // Low battery life
@@ -237,12 +237,12 @@ class SafetyControl {
                             else if (value < 20) {
                                 alarm(msg_cold_warning, false);
                             }
-                            else if (value > 40) {
+                            else if (value > 44) {
                                 alarm(msg_heat_warning, true);
                             }
                             else if (i+1<tracking_size) {
                                 // Check delta between readings (with next in history array, not for last element)
-                                if (fabs(value-track_temps[i+1][c][s]) > 2) {
+                                if (fabs(value-track_temps[i+1][c][s]) > 0.5) {
                                     alarm(msg_sudden_temperature_sensor_difference, true);
                                 }
                             }   
@@ -265,15 +265,30 @@ class SafetyControl {
                     }
                     else {
                         // Sanity check values
-                        if (value < 0 || value > 2000) {
-                            alarm(msg_invalid_heating_current_sensor_data, false);
+                        float bound = 0.0;      //mA, boundary for each heating zone based on testing
+                        switch (s) {
+                            case 0:
+                                bound = 2800;
+                                break;
+                            case 1:
+                                bound = 2000;
+                                break;
+                            case 2:
+                                bound = 4300;
+                                break;
+                            case 3:
+                                bound = 2700;
+                                break;
+                        }
+                        if (value < 0 || value > bound) {
+                            alarm(msg_invalid_heating_current_sensor_data, true);
                         } 
                     }  
                 }
                 // Compare current with sent PWM signals
                 float heating_pwm_current = 10 * pwm_heating[s];    // WIP! mA, converting PWM to A of a single PWM channel, magic?
                 if (fabs(track_currents[cnt][s]-heating_pwm_current) > 500) {
-                    alarm(msg_misaligned_heating_current, true);
+                    alarm(msg_misaligned_heating_current, false);
                 }
             }
 
