@@ -98,23 +98,23 @@ public:
         // w: warning
         switch (key) {
             case 'b':
-                printf("UART_RX: BatPerc: %d\n", value);
+                if (debug) printf("uart_rx: BatPerc: %d\n", value);
                 break;
             case 'c':
-                printf("UART_RX: CurAvgMeasTemp: %d\n", value);
+                if (debug) printf("uart_rx: CurAvgMeasTemp: %d\n", value);
                 break;
             case 'd':
-                printf("UART_RX: CurSetTempControlMCU: %d\n", value);
+                if (debug) printf("uart_rx: CurSetTempControlMCU: %d\n", value);
                 break;
             case 'u':
-                printf("UART_RX: UpdateLegSetTemp: %d\n", value);
+                if (debug) printf("uart_rx: UpdateLegSetTemp: %d\n", value);
                 current_set_temp = value;
                 break;
             case 'e':
-                printf("UART_RX: ErrorMsg: %d\n", value);
+                if (debug) printf("uart_rx: ErrorMsg: %d\n", value);
                 break;
             case 'w':
-                printf("UART_RX: WarningMsg: %d\n", value);
+                if (debug) printf("uart_rx: WarningMsg: %d\n", value);
                 break;
             default:
                 printf("ERR: UART_RX: Unknown: {%c - %d}\n", key, value);
