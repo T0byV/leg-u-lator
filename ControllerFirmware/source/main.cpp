@@ -54,7 +54,7 @@ int main() {
     const uint8_t number_of_heating_zones = 4;
 
     if (debug) printf("Init I2C bus.\n");
-    SyncI2CMaster bus0{0, 20, 21, false};
+    SyncI2CMaster bus0{0, 20, 21, true};
 
     if (debug) printf("Init UART bus.\n");
     UART uart_bus{uart1, 4, 5};
@@ -72,8 +72,8 @@ int main() {
     if (debug) printf("Setup zone temperature conversion.\n");
     WeightedTemperaturePoints<6, 2, 6, 4> zone_temperatures{&sensing, {{
         {0.90, 0.00, 0.00, 0.00},
-        {0.50, 0.34, 0.00, 0.00},
-        {0.50, 0.00, 0.45, 0.00},
+        {0.05, 0.34, 0.00, 0.00},
+        {0.05, 0.00, 0.45, 0.00},
         {0.00, 0.23, 0.00, 0.45},
         {0.00, 0.00, 0.15, 0.55},
         {0.00, 0.43, 0.40, 0.00}
@@ -81,19 +81,23 @@ int main() {
 
     if (debug) printf("Init heating power sensors.\n");
     std::array<INA219, number_of_heating_zones> heating_power_sensors = {{
-        {&bus0, 0x45, 1, 0.101}, // Channel 1
-        {&bus0, 0x44, 1, 0.1012}, // Channel 2
-        {&bus0, 0x41, 1, 0.1005}, // Channel 3
-        {&bus0, 0x40, 1, 0.1006}  // Channel 4
+        {&bus0, 0x45, 3, 0.101}, // Channel 1
+        {&bus0, 0x44, 3, 0.1012}, // Channel 2
+        {&bus0, 0x41, 3, 0.1005}, // Channel 3
+        {&bus0, 0x40, 3, 0.1006}  // Channel 4
     }};
 
     if (debug) printf("Init PWM channels heating zones.\n");
-    float max_duty_cycle = 0.3;
+    float max_duty_cycle_element1 = 0.5 * 0.8;
+    float max_duty_cycle_element2 = 0.5 * 0.8;
+    float max_duty_cycle_element3 = 0.7 * 0.8;
+    float max_duty_cycle_element4 = 0.0;  // turn off due to buuurn
+    // float max_duty_cycle_element4 = 0.45;
     std::array<PWM, number_of_heating_zones> heating_pwm_channels = {{
-        {heatingzone1_gpio, max_duty_cycle},
-        {heatingzone2_gpio, max_duty_cycle},
-        {heatingzone3_gpio, max_duty_cycle},
-        {heatingzone4_gpio, max_duty_cycle}
+        {heatingzone1_gpio, max_duty_cycle_element1},
+        {heatingzone2_gpio, max_duty_cycle_element2},
+        {heatingzone3_gpio, max_duty_cycle_element3},
+        {heatingzone4_gpio, max_duty_cycle_element4}
     }};
     for (int i = 0; i < 4; i++) {
         heating_pwm_channels[i].enable();
@@ -103,10 +107,12 @@ int main() {
     PWM buzzer = {buzzer_gpio, 0.5};
     buzzer.enable();
     buzzer.set_duty_cycle_safe(0.5);
-    sleep_ms(400);
+    sleep_ms(100);
     buzzer.set_duty_cycle_safe(0.0);
-
-  
+    sleep_ms(100);
+    buzzer.set_duty_cycle_safe(0.5);
+    sleep_ms(100);
+    buzzer.set_duty_cycle_safe(0.0);
     if (info) printf("Init battery voltage processing.\n");
     Battery bat;
     // bat.startup()
@@ -117,12 +123,16 @@ int main() {
 
     if (info) printf("Init heating zones (PWM + sensors).\n");
     float calibration_duty_cycle = 0.3;
-    float max_power_mw_per_element = 200.0;
+    float max_power_mw_element1 = 7000.0 * 0.5;
+    float max_power_mw_element2 = 11000.0 * 0.5;
+    float max_power_mw_element3 = 20000.0 * 0.5;
+    float max_power_mw_element4 = 0.0;  // turn off due to buuurn
+    // float max_power_mw_element4 = 13000.0 * 0.5;
     std::array<HeatingElement, number_of_heating_zones> heating_elements = {{
-        {0, &heating_pwm_channels[0], &heating_power_sensors[0], max_power_mw_per_element, calibration_duty_cycle},
-        {1, &heating_pwm_channels[1], &heating_power_sensors[1], max_power_mw_per_element, calibration_duty_cycle},
-        {2, &heating_pwm_channels[2], &heating_power_sensors[2], max_power_mw_per_element, calibration_duty_cycle},
-        {3, &heating_pwm_channels[3], &heating_power_sensors[3], max_power_mw_per_element, calibration_duty_cycle}
+        {0, &heating_pwm_channels[0], &heating_power_sensors[0], max_power_mw_element1, calibration_duty_cycle},
+        {1, &heating_pwm_channels[1], &heating_power_sensors[1], max_power_mw_element2, calibration_duty_cycle},
+        {2, &heating_pwm_channels[2], &heating_power_sensors[2], max_power_mw_element3, calibration_duty_cycle},
+        {3, &heating_pwm_channels[3], &heating_power_sensors[3], max_power_mw_element4, calibration_duty_cycle}
     }};
     
     if (info) printf("Init PID controller.\n");
@@ -148,7 +158,7 @@ int main() {
     if (csv_output) printf("\n");
     if (info) printf("\n\n");
 
-    double setpoint_mc = 30000; // 30k mCº
+    double setpoint_mc = 21000; // 30k mCº
     int calibration_cycle_counter = 0;
     int calibration_after_cycles = 10;
     int cycle_duration_ms = 1000;
@@ -165,15 +175,15 @@ int main() {
         //bat.estimate_life(float pwr_usage_now);                         // Every few seconds: Update estimated battery hours left, needs estimated power usage from feedback model
 
         if (calibration_cycle_counter >= calibration_after_cycles) {
-            if (info) printf("Calibrating\n");
-            // "CAL: imp1,imp2,imp3,imp4\n"
+            if (info) printf("\nCalibrating: ");
+            // "CAL: imp1,imp2,imp3,imp4\n" 
             if (csv_output) printf("CAL: ");
             for (int i = 0; i < number_of_heating_zones; i++){
                 float new_impedance = heating_elements[i].calibrate_impedance();
                 if (info) printf("%.2fohm\t", new_impedance);
                 if (csv_output) printf("%.2f,", new_impedance);
             }
-            if (info || csv_output) printf("\n");
+            if (info || csv_output) printf("\nContinuing: ");
             calibration_cycle_counter = 0;
         }
         calibration_cycle_counter++;
@@ -200,21 +210,47 @@ int main() {
         // Every few seconds: Check for safety concerns
         //safety.check_safety(bool i2c_power, float powerdata_current, float powerdata_voltage, bool i2c_sensorsheating, const std::array<std::array<int32_t, 2>, 6>& temps, const std::array<float, 4>& currents, float pwr_usage_now, const std::array<float, 4>& pwm_heating, int bat_soc, bool uart_ui);
 
+        if (debug) {
+            std::array<std::array<int32_t, 2>, 6> raw_temps = sensing();
+            for (int j = 0; j < 6; j++) {
+                for (int k = 0; k < 2; k++) {
+                    printf("%.2f\t", static_cast<float>(raw_temps[j][k])*0.001);
+                }
+            }
+            printf("\n");
+        }
+
+        float desired_pow_mw_array[4] = {};
         for (int i = 0; i < number_of_heating_zones; i++)
         {
-            double desired_power_mw = 1000 * pidZones[i].update(
-                0.001 * (DELTA_MILLIKELVIN_MILLICELSIUS + setpoint_mc),
-                0.001 * (DELTA_MILLIKELVIN_MILLICELSIUS + zone_temperatures_data_mc[i])
-            );
-            desired_power_mw = 150;
-            heating_elements[i].set_power_safe(desired_power_mw);
+            desired_pow_mw_array[i] = 1000 * pidZones[i].update(
+                                                     0.001 * (DELTA_MILLIKELVIN_MILLICELSIUS + setpoint_mc),
+                                                     0.001 * (DELTA_MILLIKELVIN_MILLICELSIUS + zone_temperatures_data_mc[i]));
+            // desired_pow_mw_array[0] = 7000.0;
+            // desired_pow_mw_array[1] = 11000.0;
+            // desired_pow_mw_array[2] = 20000.0;
+            desired_pow_mw_array[3] = 0.0; // turn off due to buuurn
+            // desired_pow_mw_array[3] = 13000.0;
+            heating_elements[i].set_power_safe(desired_pow_mw_array[i]);
             sleep_ms(200);
             float actual_power = heating_elements[i].get_current_power();
-            if (csv_output) printf("%.3f,%.3f,%.3f,", desired_power_mw, actual_power, zone_temperatures_data_mc[i]);
-            if (info) printf("%.2fmW[desired:%.2fmW]\t", actual_power, desired_power_mw);
+            float current = heating_elements[i].get_current_current();
+            float actual_duty_cycle = heating_elements[i].get_current_set_duty_cycle();
+            if (csv_output) printf("%.3f,%.3f,%.3f,", desired_pow_mw_array[i], actual_power, zone_temperatures_data_mc[i]);
+            if (info) printf("[act:%.2fW][des:%.2fW][I:%.2fA[T:%.2fCº][D:%.2f] ", actual_power*0.001, desired_pow_mw_array[i]*0.001, current*0.001, zone_temperatures_data_mc[i]*0.001, actual_duty_cycle);
+        }
+        if (debug) {
+            printf("Desired power: ");
+            for (int i = 0; i < 4; i++) {
+                printf("%.2fmW\t", desired_pow_mw_array[i]);
+            }
+            printf("\n");
         }
 
         if (info || csv_output) printf("\n");
+
+        uart_bus.write("c3123#");
+        uart_bus.write("d3000167#");
         sleep_ms(cycle_duration_ms);
     }
 }

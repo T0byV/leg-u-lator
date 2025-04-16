@@ -7,3 +7,6 @@
 #include "pico/cyw43_arch.h"
 
 #define ASSERT assert
+
+constexpr bool info = true;
+constexpr bool debug = false;

@@ -46,6 +46,14 @@ class HeatingElement {
             return (0.001 * (bus_voltage_mv * duty_cycle) * (bus_voltage_mv * duty_cycle) / _impedance);
         }
 
+        float get_current_current() {
+            return power_sensor->read_current();
+        }
+
+        float get_current_set_duty_cycle() {
+            return pwm_channel->get_current_set_duty_cycle();
+        }
+
     private:
         uint8_t element_idx;
         PWM *pwm_channel;

@@ -59,5 +59,8 @@ target_link_libraries(InterfaceFirmware
         pico_multicore
         pico_lwip_http)
 
+target_compile_options(InterfaceFirmware PRIVATE -Wall -Wextra)
+
+
 pico_add_extra_outputs(InterfaceFirmware)
 add_subdirectory(src)

@@ -23,8 +23,9 @@ const char* tag_list[num_tags] = {
 };
 
 std::array<char[max_value_length], num_tags> value_list = { // Initialise to example values for testing
+// char value_list[num_tags][max_value_length] = { // Initialise to example values for testing
     "100",
-    "20.0",
+    "10000",
     "25.0",
     "",
     "",
@@ -42,7 +43,7 @@ void core1_entry() {
 }
 
 bool connect_to_wifi() {
-    if (cyw43_arch_wifi_connect_timeout_ms("Your Wi-Fi SSID", "Your Wi-Fi Password", CYW43_AUTH_WPA2_AES_PSK, 30000)) {
+    if (cyw43_arch_wifi_connect_timeout_ms("WPA network", "WPA password", CYW43_AUTH_WPA2_AES_PSK, 30000)) {
             printf("failed to connect.\n");
             return false;
         } else {
@@ -55,14 +56,15 @@ bool connect_to_wifi() {
 }
 
 u16_t handle_tags(int iIndex, char *pcInsert, int iInsertLen){
-    strncpy(pcInsert, value_list[iIndex], max_value_length);
+    strncpy(pcInsert, value_list[iIndex], max_value_length - 1);
+    if (info) printf("%s\n", value_list[2]);
     return strlen(value_list[iIndex]);
 }
 
 int main() {
     stdio_init_all();
-    // sleep_ms(1000);
-    printf("Hello world!\n");
+    sleep_ms(5000);
+    if (info) printf("Controller startup.\n");
 
     multicore_launch_core1(core1_entry);
 
@@ -75,8 +77,6 @@ int main() {
     // Enable wifi station
     cyw43_arch_enable_sta_mode();
 
-    UART uart_bus{uart0, 16, 17};
-
     printf("Attempting to establish a Wi-Fi connection...\n");
     int attempts = 10;
     for(int attempt = 0; attempt < attempts; attempt++){
@@ -88,6 +88,8 @@ int main() {
             std::cout << "Attempt " << attempt << " failed." << std::endl;
         }
     }
+
+    UART uart_bus{uart0, 16, 17};
 
     // Start lwip http server
     httpd_init();
@@ -102,7 +104,7 @@ int main() {
         // uart_bus.write("b47#");
         // uart_bus.write("c25452#");
         // uart_bus.write("d25000#");
-        uart_bus.write("u26000#");
+        // uart_bus.write("u26000#");
         // uart_bus.write("e3#");
         // uart_bus.write("w5#");
         sleep_ms(1000);

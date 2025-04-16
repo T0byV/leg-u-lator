@@ -14,15 +14,19 @@ class WeightedTemperaturePoints {
 
             for (int i = 0; i < WeightM; i++)
             {
-                float avg_zone_temperature = 0;
+                float sum_zone_temperature = 0;
                 for (int j = 0; j < WeightN; j++) {
-                    float avg_cluster_temperature = 0;
+                    float sum_cluster_temperature = 0;
                     for (int k = 0; k < SensM; k++)
-                        avg_cluster_temperature += static_cast<float>(sensor_data[j][k]);
-    
-                    avg_zone_temperature += weight_matrix[j][i] * (avg_cluster_temperature / SensM);
+                        sum_cluster_temperature += static_cast<float>(sensor_data[j][k]);
+                    
+                    float avg_cluster_temperature = sum_cluster_temperature / SensM;
+                    sum_zone_temperature += (weight_matrix[j][i] * avg_cluster_temperature);
+                    if (debug) printf("AVG: %.2f\n", avg_cluster_temperature * 0.001);
                 }
-                weighted_sensor_data[i] = avg_zone_temperature / WeightN;
+                weighted_sensor_data[i] = sum_zone_temperature;
+                if (debug) printf("WEIGHTED: %.2f\n", weighted_sensor_data[i] * 0.001);
+
             }
 
             return weighted_sensor_data;

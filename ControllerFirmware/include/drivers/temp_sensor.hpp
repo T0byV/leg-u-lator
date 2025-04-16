@@ -25,7 +25,7 @@ class PJ85775 {
         auto time_timeout = time_us_32() + 1000 * timeout_ms;
         while((read_reg(reg_setup) & (1 << 8)) == 0) {
             if(time_us_32() > time_timeout) {
-                if(debug) printf("Temp Sensor %x: Timeout on read\n", _i2c_addr);
+                if(error) printf("Temp Sensor %x: Timeout on read\n", _i2c_addr);
                 return INT32_MAX;
             }
         }
